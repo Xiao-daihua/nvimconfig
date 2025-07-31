@@ -20,7 +20,7 @@ return {
         _ = '-xelatex'
       }
       vim.g.vimtex_compiler_latexmk = {
-        build_dir = 'build',
+        build_dir = ' ',
         executable = 'latexmk',
         options = {
           '-bibtex',
@@ -33,7 +33,8 @@ return {
         continuous = 1,
         callback = 1,
       }
-
+      
+      vim.g.vimtex_compiler_start_on_edit = 1
     end
   },
   {
