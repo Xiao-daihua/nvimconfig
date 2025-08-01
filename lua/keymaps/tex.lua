@@ -77,21 +77,20 @@ vim.api.nvim_create_autocmd("FileType", {
     -- keymap("v", "<C-x>", function() wrap_visual("sout") end, opts)
 
     -- 插入模式快捷键
-    keymap("i", "<C-b>", insert_wrapper("textbf"), opts)
+    keymap("i", "<C-j>", insert_wrapper("textbf"), opts)
     keymap("i", "<C-h>", insert_wrapper("hlr"), opts)
-    keymap("i", "<C-i>", insert_wrapper("textit"), opts)
-    keymap("i", "<C-x>", insert_wrapper("sout"), opts)
+    keymap("i", "<C-k>", insert_wrapper("textit"), opts)
+    keymap("i", "<C-g>", insert_wrapper("sout"), opts)
     keymap("i", "<C-r>", insert_wrapper("cref"), opts)
     keymap("i", "<C-l>", insert_wrapper("label"), opts)
 
     -- 插入模式特殊命令 \tensor{}{}
-    keymap("i", "<C-t>", function()
+    keymap("i", "<C-ts>", function()
       local line = "\\tensor{}{}"
       vim.api.nvim_put({ line }, 'c', true, true)
       vim.cmd("startinsert!")
       vim.cmd("normal! 0f{l") -- 光标定位第一个大括号内
     end, opts)
-
   end,
 })
 

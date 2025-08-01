@@ -7,11 +7,6 @@ return {
 
     -- Header: 用 ASCII Art 拼出 X.D.H.
     dashboard.section.header.val = {
-
-
-"",
-"",
-"",
 "",
 "",
 "",
