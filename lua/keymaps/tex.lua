@@ -71,10 +71,10 @@ vim.api.nvim_create_autocmd("FileType", {
     
 
      -- 视觉模式快捷键
-    keymap("v", "<C-b>", function() wrap_visual("textbf") end, opts)
-    keymap("v", "<C-h>", function() wrap_visual("hlr") end, opts)
-    keymap("v", "<C-i>", function() wrap_visual("textit") end, opts)
-    keymap("v", "<C-x>", function() wrap_visual("sout") end, opts)
+    -- keymap("v", "<C-b>", function() wrap_visual("textbf") end, opts)
+    -- keymap("v", "<C-h>", function() wrap_visual("hlr") end, opts)
+    -- keymap("v", "<C-i>", function() wrap_visual("textit") end, opts)
+    -- keymap("v", "<C-x>", function() wrap_visual("sout") end, opts)
 
     -- 插入模式快捷键
     keymap("i", "<C-b>", insert_wrapper("textbf"), opts)

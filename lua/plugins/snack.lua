@@ -6,10 +6,16 @@ return {
     terminal = {
       bo = {
         filetype = "snacks_terminal",
+        buflisted = false,  -- 终端buffer不列在buffer列表中，减少干扰
+        bufhidden = "hide", -- 关闭时隐藏buffer，防止意外丢失
       },
-      wo = {},
+      wo = {
+        number = false,    -- 终端里不显示行号
+        relativenumber = false,
+        signcolumn = "no",
+      },
       keys = {
-        q = "hide",
+        q = "hide", -- normal mode下面使用q就是hide这个terminal
         gf = function(self)
           local f = vim.fn.findfile(vim.fn.expand("<cfile>"), "**")
           if f == "" then
@@ -38,21 +44,6 @@ return {
           desc = "Double escape to normal mode",
         },
       },
-
     },
   },
-  keys = {
-    {
-      "<leader>tt",
-      function()
-        -- 如果在 terminal 模式，先退出再 toggle
-        if vim.fn.mode() == "t" then
-          vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-\\><C-n>", true, true, true), "n", true)
-        end
-        Snacks.terminal.toggle()
-      end,
-      desc = "Toggle Terminal",
-    },
-  },
-
 }

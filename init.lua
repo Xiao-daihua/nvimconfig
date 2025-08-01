@@ -41,3 +41,18 @@ require("keymaps.tex")
 -- 插件系统的配置文件
 require("config.lazy")
 
+
+-- 快捷键绑定（例如放在 lua/config/keymaps.lua 或 init.lua 中）
+vim.keymap.set("n", "<leader>tt", function()
+  local dir = vim.fn.expand("%:p:h") -- 获取当前文件所在的目录
+  require("snacks").terminal(nil, {
+    cwd = dir, -- 设置终端工作目录
+    win = {
+      split = "below", -- 水平打开在下方
+      position = "bottom", -- 定位到底部
+      height = 0.3, -- 占用屏幕 30%
+    },
+    auto_insert = true, -- 自动进入插入模式
+    auto_close = false, -- 终端退出后不自动关闭窗口
+  })
+end, { desc = "打开 snacks 终端并 cd 到当前目录" })

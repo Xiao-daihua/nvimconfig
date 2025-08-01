@@ -8,11 +8,12 @@ return {
 
       vim.g.vimtex_view_method = 'sioyek'
       -- 报错的提示！
-      vim.g.vimtex_quickfix_mode = 0   -- 不自动打开 quickfix
+      vim.g.vimtex_quickfix_mode = 1   -- 不自动打开 quickfix
       vim.g.vimtex_quickfix_open_on_warning = 0  -- 警告不打开 quickfix
       vim.g.vimtex_quickfix_open_on_error = 1    -- 仅报错时打开
 
       vim.g.vimtex_syntax_enabled = 0 -- 关掉syntax，因为我有treesitter可以进行高亮
+      vim.g.vimtex_compiler_enabled = 1
 
       -- latexmk 配置，使用 xelatex + bibtex
       vim.g.vimtex_compiler_method = 'latexmk'
@@ -20,7 +21,6 @@ return {
         _ = '-xelatex'
       }
       vim.g.vimtex_compiler_latexmk = {
-        build_dir = ' ',
         executable = 'latexmk',
         options = {
           '-bibtex',
@@ -30,7 +30,7 @@ return {
           '-shell-escape',
           '-verbose',
         },
-        continuous = 1,
+        continuous = 0,
         callback = 1,
       }
       

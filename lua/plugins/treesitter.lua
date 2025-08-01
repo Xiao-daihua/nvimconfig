@@ -1,4 +1,3 @@
----@diagnostic disable: missing-fields
 return {
   "nvim-treesitter/nvim-treesitter",
   branch = 'master',
@@ -7,6 +6,7 @@ return {
 
   config = function()
     require'nvim-treesitter.configs'.setup{
+       ensure_installed = { "c", "lua", "html", "javascript", "css" },
       auto_install = true,
       highlight = {enable = true},
       indent = {enable = true}

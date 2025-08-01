@@ -33,3 +33,4 @@ vim.api.nvim_set_keymap("n", "<leader>Q", ":wa | :qa<CR>", { noremap = true, sil
 
 -- 实现复制到剪切板的快捷键(注意这个是在可视模式下面的模板)
 vim.api.nvim_set_keymap('v', '<leader>y', '"+y', { noremap = true, silent = true })
+
