@@ -72,23 +72,7 @@ return{
       })
 
       -- latex
-      lspconfig.texlab.setup({
-        capabilities = capabilities,
-        settings = {
-          texlab = {
-            build = {
-              executable = "latexmk",
-              args = { "-pdf", "-interaction=nonstopmode", "-synctex=1", "%f" },
-              onSave = true,  -- 保存时自动编译
-              forwardSearchAfter = true,
-            },
-            forwardSearch = {
-              executable = "zathura",  -- 或 Skim, Evince 等
-              args = { "--synctex-forward", "%l:1:%f", "%p" },
-            },
-          },
-        },
-      })
+      lspconfig.texlab.setup({ })
 
       -- LSP常用的快捷键
       vim.keymap.set("n", "gd", vim.lsp.buf.definition, { desc = "Go to Definition" })
