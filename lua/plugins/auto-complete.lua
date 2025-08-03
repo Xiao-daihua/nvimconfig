@@ -17,6 +17,7 @@ return {
       require("luasnip.loaders.from_vscode").lazy_load()
       -- 自定义latex快捷键
       require("luasnip.loaders.from_lua").lazy_load({ paths = "~/.config/nvim/lua/snippet" })
+      require("luasnip.loaders.from_lua").lazy_load()
 
 
       cmp.setup({

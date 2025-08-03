@@ -32,6 +32,9 @@ return {
     end
   },
   {
+    "evesdropper/luasnip-latex-snippets.nvim",
+  },
+  {
     "HakonHarnes/img-clip.nvim",
     event = "VeryLazy",
     opts = {
