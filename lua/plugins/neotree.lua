@@ -81,6 +81,20 @@ return {
       },
 
       filesystem = {
+        commands = {
+          delete = function(state)
+            local node = state.tree:get_node()
+            if node == nil then return end
+            local path = node.path
+            -- 调用 trash-cli 命令
+            local cmd = "trash " .. vim.fn.shellescape(path)
+            os.execute(cmd)
+            -- 刷新树
+            state.commands.refresh(state)
+          end,
+        },
+
+
         filtered_items = {
           filtered_items = {
             visible = true,          -- 显示被隐藏规则过滤的文件
