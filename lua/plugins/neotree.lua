@@ -26,29 +26,39 @@ return {
           with_markers = false,
         },
         icon = {
-          folder_closed = "",
-          folder_open = "",
-          folder_empty = "",
-          default = "",
+          folder_closed = "",   -- 经典文件夹图标，满满文件夹感觉（ U+f07b）
+          folder_open = "",     -- 打开的文件夹图标（ U+f07c）
+          folder_empty = "",    -- 空文件夹图标，保持简洁（ U+f114）
+          default = "",         -- 默认文件图标，像纸张（ U+f15c）
           highlight = "NeoTreeFileIcon",
         },
         modified = {
-          symbol = "[+]",
+          symbol = "●",           -- 小圆点，比 [+] 更简洁优雅
           highlight = "NeoTreeModified",
         },
         git_status = {
           symbols = {
-            added     = "✚",
-            modified  = "",
-            deleted   = "✖",
-            renamed   = "➜",
-            untracked = "",
-            ignored   = "",
-            unstaged  = "",
-            staged    = "",
-            conflict  = "",
+            added     = "",  -- 加号，新增文件
+            modified  = "",  -- 修改，点点符号
+            deleted   = "",  -- 删除，叉号
+            renamed   = "➜",  -- 重命名，箭头
+            untracked = "",  -- 未跟踪，问号
+            ignored   = "◌",  -- 忽略，圆圈
+            unstaged  = "",  -- 未暂存，铅笔
+            staged    = "",  -- 已暂存，箭头圈
+            conflict  = "",  -- 冲突，Git Merge 图标
           },
         },
+      },
+      highlight = {
+        NeoTreeFileIcon = { fg = "#61afef" },       -- 天蓝色，文件图标
+        NeoTreeFolderName = { fg = "#e5c07b", bold = true },  -- 金黄色，文件夹名
+        NeoTreeModified = { fg = "#e06c75", bold = true },    -- 柔和红色，已修改标记
+        NeoTreeGitAdded = { fg = "#98c379" },        -- 绿色，新增的文件
+        NeoTreeGitModified = { fg = "#e5c07b" },     -- 黄色，git 修改
+        NeoTreeGitDeleted = { fg = "#e06c75" },      -- 红色，git 删除
+        NeoTreeGitRenamed = { fg = "#61afef" },      -- 蓝色，git 重命名
+        NeoTreeGitUntracked = { fg = "#56b6c2" },    -- 青色，git 未跟踪
       },
       window = {
         position = "float", 
