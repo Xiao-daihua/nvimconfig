@@ -7,34 +7,28 @@ return {
     dependencies ={
       "saadparwaiz1/cmp_luasnip",
       "rafamadriz/friendly-snippets"
-    } 
+    },
   },
   {
     "hrsh7th/nvim-cmp",
     config = function()
       local cmp = require'cmp'
-      -- 应用基本的frendly-snippet
+      -- vscode类型的snippet的加入
       require("luasnip.loaders.from_vscode").lazy_load()
-      -- 自定义latex快捷键
+      -- 自定义的snippet的加入
       require("luasnip.loaders.from_lua").lazy_load({ paths = "~/.config/nvim/lua/snippet" })
-      require("luasnip.loaders.from_lua").lazy_load()
+      -- latex的snippet路径加入
+      local snippet_path = vim.fn.expand("~/.config/nvim/lua/snippet/tex")
+      require("luasnip.loaders.from_lua").lazy_load({
+        paths = snippet_path,
+      })
 
 
       cmp.setup({
         snippet = {
           -- REQUIRED - you must specify a snippet engine
           expand = function(args)
-            -- vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
             require('luasnip').lsp_expand(args.body) -- For `luasnip` users.我先使用luasnip实现所有的snippet，如果使用其他插件则选择对应的
-            -- require('snippy').expand_snippet(args.body) -- For `snippy` users.
-            -- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
-            -- vim.snippet.expand(args.body) -- For native neovim snippets (Neovim v0.10+)
-
-            -- For `mini.snippets` users:
-            -- local insert = MiniSnippets.config.expand.insert or MiniSnippets.default_insert
-            -- insert({ body = args.body }) -- Insert at cursor
-            -- cmp.resubscribe({ "TextChangedI", "TextChangedP" })
-            -- require("cmp.config").set_onetime({ sources = {} })
           end,
         },
         window = {
@@ -50,10 +44,8 @@ return {
         }),
         sources = cmp.config.sources({
           { name = 'nvim_lsp' },
-          -- { name = 'vsnip' }, -- For vsnip users.
           { name = 'luasnip' }, -- For luasnip users.
-          -- { name = 'ultisnips' }, -- For ultisnips users.
-          -- { name = 'snippy' }, -- For snippy users.
+          { name = 'render-markdown' },
         }, {
             { name = 'buffer' },
           })

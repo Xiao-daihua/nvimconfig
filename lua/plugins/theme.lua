@@ -8,7 +8,7 @@ return {
   --     vim.cmd([[colorscheme tokyonight-storm]])
   --   end,
   -- },
-  { 
+  {
     "catppuccin/nvim", 
     name = "catppuccin", 
     priority = 1000,

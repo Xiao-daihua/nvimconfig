@@ -1,3 +1,6 @@
+
+vim.opt.termguicolors = true
+
 -- 这个是nvim使用的主要的配置文件
 vim.cmd("set expandtab")
 vim.cmd("set tabstop=2")
@@ -56,3 +59,8 @@ vim.keymap.set("n", "<leader>tt", function()
     auto_close = false, -- 终端退出后不自动关闭窗口
   })
 end, { desc = "打开 snacks 终端并 cd 到当前目录" })
+
+
+
+
+

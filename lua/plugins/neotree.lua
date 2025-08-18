@@ -42,7 +42,6 @@ return {
             modified  = "",  -- 修改，点点符号
             deleted   = "",  -- 删除，叉号
             renamed   = "➜",  -- 重命名，箭头
-            untracked = "",  -- 未跟踪，问号
             ignored   = "◌",  -- 忽略，圆圈
             unstaged  = "",  -- 未暂存，铅笔
             staged    = "",  -- 已暂存，箭头圈
@@ -93,7 +92,6 @@ return {
             state.commands.refresh(state)
           end,
         },
-
 
         filtered_items = {
           filtered_items = {

@@ -72,7 +72,9 @@ return{
       })
 
       -- latex
-      lspconfig.texlab.setup({ })
+      lspconfig.texlab.setup({ 
+        capabilities = capabilities,
+      })
 
       -- LSP常用的快捷键
       vim.keymap.set("n", "gd", vim.lsp.buf.definition, { desc = "Go to Definition" })

@@ -50,7 +50,7 @@ return {
       },
       filetypes = {
         tex = {
-          -- 这是插件内置的 TeX 模板，支持 LaTeX 输出
+          -- 下面可以修改模板！
           template = [[
 \begin{figure}[H]
   \centering
