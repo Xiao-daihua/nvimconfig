@@ -4,18 +4,21 @@ return {
   config = function()
     require('lualine').setup {
       options = {
-        theme = 'catppuccin',
+        theme = 'rose-pine',
         icons_enabled = true,
         component_separators = { left = '', right = '' },
-        section_separators = { left = '', right = '' },
-        disabled_filetypes = { 'NvimTree', 'neo-tree' },
+        -- section_separators = { left = '', right = '' },
+        disabled_filetypes = {
+          statusline = { 'NvimTree', 'neo-tree', 'alpha', 'starter' }, -- 首页和侧边栏禁用
+          winbar = {},
+        },
         always_divide_middle = true,
       },
       sections = {
-        lualine_a = { { 'mode', icon = '' } },
+        lualine_a = { { 'mode', icon = '' } },
         lualine_b = { { 'branch', icon = '' }, 'diff', 'diagnostics' },
         lualine_c = { { 'filename', path = 1 } },
-        lualine_x = { 'encoding', 'fileformat', 'filetype' },
+        lualine_x = { 'encoding','filetype' },
         lualine_y = { { 'progress', icon = '' } },
         lualine_z = { 'location' }
       },

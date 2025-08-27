@@ -8,12 +8,25 @@ return {
   --     vim.cmd([[colorscheme tokyonight-storm]])
   --   end,
   -- },
+  -- {
+  --   "catppuccin/nvim", 
+  --   name = "catppuccin", 
+  --   priority = 1000,
+  --   config = function()
+  --     vim.cmd.colorscheme "catppuccin"
+  --   end
+  -- },
   {
-    "catppuccin/nvim", 
-    name = "catppuccin", 
-    priority = 1000,
+    "rose-pine/neovim",
+    name = "rose-pine",
     config = function()
-      vim.cmd.colorscheme "catppuccin"
-    end
-  }
+      require("rose-pine").setup({
+        variant = "moon", -- 🌙 这里切换成 moon
+        disable_background = false,
+        disable_float_background = false,
+        disable_italics = false,
+      })
+      vim.cmd("colorscheme rose-pine")
+    end,
+  },
 } 

@@ -45,7 +45,7 @@ require("keymaps.tex")
 require("config.lazy")
 
 
--- 快捷键绑定（例如放在 lua/config/keymaps.lua 或 init.lua 中）
+-- 辅助snack开启terminal的快捷键
 vim.keymap.set("n", "<leader>tt", function()
   local dir = vim.fn.expand("%:p:h") -- 获取当前文件所在的目录
   require("snacks").terminal(nil, {
