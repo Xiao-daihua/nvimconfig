@@ -73,9 +73,17 @@ return {
         },
         mappings = {
           ["<esc>"] = "close_window",
-          ["<Right>"] = "set_root",      -- 下一级目录作为根目录
-          ["<Left>"]  = "navigate_up", -- 返回上一级目录
-          ["yy"] = "copy_to_clipboard",   -- 复制文件路径
+          ["l"] = "set_root",      -- 下一级目录作为根目录
+          ["h"]  = "navigate_up", -- 返回上一级目录
+          -- neotree自带的复制到剪切板功能是不可靠的，不能在mac上工作需要自己写一个。
+          ["Y"] = function(state)
+            local node = state.tree:get_node()
+            if node then
+              local path = node.path
+              vim.fn.setreg("+", path) -- 复制到系统剪贴板
+              print("Copied path: " .. path)
+            end
+          end,
         },
       },
 
