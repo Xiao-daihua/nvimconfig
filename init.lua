@@ -1,4 +1,7 @@
+-- 开启conceal保证neorg能够正常使用
+vim.opt.conceallevel = 2
 
+-- 开启true color支持
 vim.opt.termguicolors = true
 
 -- 这个是nvim使用的主要的配置文件
