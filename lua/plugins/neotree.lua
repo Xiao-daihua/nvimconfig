@@ -60,17 +60,18 @@ return {
         NeoTreeGitUntracked = { fg = "#56b6c2" },    -- 青色，git 未跟踪
       },
       window = {
-        position = "float", 
-        popup = {
-          size = {
-            height = "80%",
-            width = "60%",
-          },
-          position = "50%", 
-          border = {
-            style = "rounded", 
-          },
-        },
+        position = "left", 
+        width = 25,
+        -- popup = {
+        --   size = {
+        --     height = "80%",
+        --     width = "30%",
+        --   },
+        --   position = "30%", 
+        --   border = {
+        --     style = "rounded", 
+        --   },
+        -- },
         mappings = {
           ["<esc>"] = "close_window",
           ["l"] = "set_root",      -- 下一级目录作为根目录

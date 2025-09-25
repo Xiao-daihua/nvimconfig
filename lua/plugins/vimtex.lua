@@ -9,7 +9,7 @@ return {
       vim.g.vimtex_compiler_autoload = 0
       vim.g.vimtex_compiler_method = 'latexmk'
       vim.g.vimtex_compiler_latexmk = {
-        continuous = 0,
+        continuous = 1,
         executable = 'latexmk',
         options = {
           '-synctex=1',
@@ -25,14 +25,12 @@ return {
 
       vim.g.vimtex_view_method = 'sioyek'
        -- 报错的提示！
-      vim.g.vimtex_quickfix_mode = 1   -- 不自动打开 quickfix
-      vim.g.vimtex_quickfix_open_on_warning = 0  -- 警告不打开 quickfix
-      vim.g.vimtex_quickfix_open_on_error = 1    -- 仅报错时打开
+      vim.g.vimtex_quickfix_height = 8
+      vim.g.vimtex_quickfix_mode = 1   
+      vim.g.vimtex_quickfix_open_on_warning = 0  
+      vim.g.vimtex_quickfix_open_on_error = 1   
       vim.g.vimtex_syntax_enabled = 0 -- 关掉syntax，因为我有treesitter可以进行高亮
     end
-  },
-  {
-    "evesdropper/luasnip-latex-snippets.nvim",
   },
   {
     "HakonHarnes/img-clip.nvim",

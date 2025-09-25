@@ -6,23 +6,22 @@ return {
     "L3MON4D3/LuaSnip",
     dependencies ={
       "saadparwaiz1/cmp_luasnip",
-      "rafamadriz/friendly-snippets"
+      "rafamadriz/friendly-snippets",
+      "evesdropper/luasnip-latex-snippets.nvim"
     },
+    option = function ()
+      require("luasnip-latex-snippets").setup()
+    end
   },
   {
     "hrsh7th/nvim-cmp",
     config = function()
       local cmp = require'cmp'
-      -- vscode类型的snippet的加入
       require("luasnip.loaders.from_vscode").lazy_load()
-      -- 自定义的snippet的加入
+      -- 加入自定义snippet目录
       require("luasnip.loaders.from_lua").lazy_load({ paths = "~/.config/nvim/lua/snippet" })
-      -- latex的snippet路径加入
-      local snippet_path = vim.fn.expand("~/.config/nvim/lua/snippet/tex")
-      require("luasnip.loaders.from_lua").lazy_load({
-        paths = snippet_path,
-      })
-
+      require("luasnip.loaders.from_lua").lazy_load( )
+      
 
       cmp.setup({
         snippet = {

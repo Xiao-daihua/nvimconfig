@@ -37,17 +37,17 @@ return{
       -- 匹配snippet cmp nvim lsp的操作
       local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
-      -- 这里我们配置我们支持的每一种语言
-      -- Lua语言
-      local lspconfig = require("lspconfig")
-      lspconfig.lua_ls.setup({
-        capabilities = capabilities,
 
+      -- 全局能力配置
+      vim.lsp.config('*', {
+        capabilities = capabilities,
+      })
+
+      -- Lua
+      vim.lsp.config('lua_ls', {
         settings = {
           Lua = {
-            diagnostics = {
-              globals = { "vim" },
-            },
+            diagnostics = { globals = { "vim" } },
             workspace = {
               library = vim.api.nvim_get_runtime_file("", true),
               checkThirdParty = false,
@@ -56,25 +56,58 @@ return{
           },
         },
       })
-      -- python
-      lspconfig.pyright.setup({
+
+      -- Python
+      vim.lsp.config('pyright', {
         capabilities = capabilities,
       })
 
-      -- C/Cpp
-      lspconfig.clangd.setup({
+      -- C / C++
+      vim.lsp.config('clangd', {
         capabilities = capabilities,
       })
 
-      -- markdown
-      lspconfig.marksman.setup({
+      -- Markdown
+      vim.lsp.config('marksman', {
         capabilities = capabilities,
       })
 
-      -- latex
-      lspconfig.texlab.setup({ 
+      -- LaTeX
+      vim.lsp.config('texlab', {
         capabilities = capabilities,
       })
+
+      -- -- 这里我们配置我们支持的每一种语言
+      -- local lspconfig = require("lspconfig") 
+      -- lspconfig.lua_ls.setup({ 
+      --   capabilities = capabilities, 
+      --   settings = { 
+      --     lua = { diagnostics = { globals = { "vim" }, }, 
+      --       workspace = { library = vim.api.nvim_get_runtime_file("", true), checkthirdparty = false, }, 
+      --       telemetry = { enable = false }, 
+      --     }, 
+      --   },
+      -- })
+      -- -- lua语言
+      -- -- python
+      -- lspconfig.pyright.setup({
+      --   capabilities = capabilities,
+      -- })
+      --
+      -- -- c/cpp
+      -- lspconfig.clangd.setup({
+      --   capabilities = capabilities,
+      -- })
+      --
+      -- -- markdown
+      -- lspconfig.marksman.setup({
+      --   capabilities = capabilities,
+      -- })
+      --
+      -- -- latex
+      -- lspconfig.texlab.setup({ 
+      --   capabilities = capabilities,
+      -- })
 
       -- LSP常用的快捷键
       vim.keymap.set("n", "gd", vim.lsp.buf.definition, { desc = "Go to Definition" })
