@@ -62,16 +62,6 @@ return {
       window = {
         position = "left", 
         width = 25,
-        -- popup = {
-        --   size = {
-        --     height = "80%",
-        --     width = "30%",
-        --   },
-        --   position = "30%", 
-        --   border = {
-        --     style = "rounded", 
-        --   },
-        -- },
         mappings = {
           ["<esc>"] = "close_window",
           ["l"] = "set_root",      -- 下一级目录作为根目录
@@ -87,7 +77,19 @@ return {
           end,
         },
       },
-
+      event_handlers = {
+        {
+          event = "file_opened",
+          handler = function(file_path)
+            if file_path:match("%.pdf$") then
+              -- 使用 sioyek 打开 PDF
+              vim.fn.jobstart({ "sioyek", file_path }, { detach = true })
+              -- 关闭当前 buffer（防止 nvim 尝试打开 PDF）
+              vim.cmd("bd!")
+            end
+          end,
+        },
+      },
       filesystem = {
         commands = {
           delete = function(state)

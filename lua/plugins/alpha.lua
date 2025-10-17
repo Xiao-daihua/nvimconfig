@@ -12,6 +12,10 @@ return {
 "",
 "",
 "",
+"",
+"",
+"",
+"",
       "                X . D . H               ",
     }
 
@@ -20,8 +24,9 @@ return {
       dashboard.button("l", "  Lazy", ":Lazy<CR>"),
       dashboard.button("m", "  Mason", ":Mason<CR>"),
       dashboard.button("e", "  Neo-tree", ":Neotree toggle<CR>"),
-      dashboard.button("c", "  Code", ":Neotree dir=~/code<CR>"),
+      dashboard.button("c", "  Code", ":e ~/code<CR>"),
       dashboard.button("n", "  Config", ":e ~/.config/nvim/<CR>"),
+      dashboard.button("p", "  EPFL Phys", ":e ~/Code/Latex_Note/EPFL_phys_course/<CR>"),
       dashboard.button("q", "  Quit", ":qa<CR>"),
     }
 
