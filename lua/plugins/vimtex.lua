@@ -48,7 +48,6 @@ return {
       },
       filetypes = {
         tex = {
-          -- 下面可以修改模板！
           template = [[
 \begin{figure}[H]
   \centering

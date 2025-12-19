@@ -1,5 +1,3 @@
-
-
 -- 取消搜索后高亮快捷键
 vim.keymap.set("n", "<Esc>", function()
   vim.cmd("nohlsearch")

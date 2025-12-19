@@ -87,6 +87,12 @@ return {
               -- 关闭当前 buffer（防止 nvim 尝试打开 PDF）
               vim.cmd("bd!")
             end
+
+            -- if file_path:match("%.html?$") then
+            --   vim.fn.jobstart({ "open", file_path }, { detach = true })
+            --   vim.cmd("bd!")  -- 关闭 buffer 防止在 nvim 打开
+            -- end
+
           end,
         },
       },
@@ -106,18 +112,15 @@ return {
 
         filtered_items = {
           filtered_items = {
-            visible = true,          -- 显示被隐藏规则过滤的文件
-            hide_dotfiles = true,    -- 默认隐藏点文件
-            hide_gitignored = true,  -- 默认隐藏 .gitignore 的文件
-            hide_by_name = {         -- 按名字隐藏
+            visible = true, 
+            hide_by_name = {
               ".git", ".DS_Store",
-              -- 不要在这里写 .zshrc 和 .config
             },
-            never_show = {           -- 永远不要显示的文件/文件夹
+            never_show = {        
               ".Trash",
             },
           },
-          always_show = { ".zshrc", ".config" },  -- 指定始终显示的文件夹和文件
+          always_show = { ".make4ht", ".zshrc", ".config" },
         },
       },
     })

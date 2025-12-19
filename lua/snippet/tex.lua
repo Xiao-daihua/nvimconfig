@@ -14,13 +14,14 @@ end
 local math_font_snippets = {}
 
 -- 自动生成 mA-mZ、bbA-bbZ、rmA-rmZ、sfA-sfZ、scrA-scrZ
-local fonts = { "m", "bb", "rm", "sf", "scr" }
+local fonts = { "m", "bb", "rm", "sf", "scr","bf" }
 local font_cmd = {
   m = "\\mathcal{",
   bb = "\\mathbb{",
   rm = "\\mathrm{",
   sf = "\\mathsf{",
   scr = "\\mathscr{",
+  bf = "\\mathbf{",
 }
 
 for _, prefix in ipairs(fonts) do
@@ -50,13 +51,6 @@ local env_snippets = {
     t({ "", "\\end{align}" }),
   }),
 
-  -- aligned 环境
-  s("ali", {
-    t("\\begin{aligned}"),
-    t({"", "  "}), i(1),
-    t({"", "\\end{aligned}"}), i(0)
-  }),
-
 
   -- 各种 theorem/definition 等
   s("defi", { t("\\defi{"), i(1), t("}") }),
@@ -77,54 +71,53 @@ local env_snippets = {
   -- 广相常用
   s("ten", { t("\\tensor{"), i(1), t("}{"), i(2), t("}") }),
   s("pd",  { t("\\partial_{"), i(1), t("}"), i(0) }),
+  s("par", {t("\\partial"),i(0),})
 
   -- \question{}
   s("qs", { t("\\question{"), i(1), t("}") }),
   s("bs", { t("\\bigskip") }),
 
-  -- 希腊字母
+  -- \item
+  s("ii", { t("\\item ") }),
+
     -- 小写希腊字母
-  s("ga", { t("\\alpha") }),
-  s("gb", { t("\\beta") }),
-  s("gg", { t("\\gamma") }),
-  s("gd", { t("\\delta") }),
-  s("ge", { t("\\epsilon") }),
-  s("gz", { t("\\zeta") }),
-  s("ge", { t("\\eta") }),
-  s("gth", { t("\\theta") }),
-  s("gi", { t("\\iota") }),
-  s("gk", { t("\\kappa") }),
-  s("gl", { t("\\lambda") }),
-  s("gm", { t("\\mu") }),
-  s("gn", { t("\\nu") }),
-  s("gx", { t("\\xi") }),
-  s("go", { t("\\omicron") }),
-  s("gp", { t("\\pi") }),
-  s("gr", { t("\\rho") }),
-  s("gs", { t("\\sigma") }),
-  s("gt", { t("\\tau") }),
-  s("gu", { t("\\upsilon") }),
-  s("gf", { t("\\phi") }),
-  s("gc", { t("\\chi") }),
-  s("gpsi", { t("\\psi") }),
-  s("go", { t("\\omega") }),
+  s("alp", { t("\\alpha") }),
+  s("bet", { t("\\beta") }),
+  s("gam", { t("\\gamma") }),
+  s("del", { t("\\delta") }),
+  s("eps", { t("\\epsilon") }),
+  s("zet", { t("\\zeta") }),
+  s("eta", { t("\\eta") }),
+  s("the", { t("\\theta") }),
+  s("iot", { t("\\iota") }),
+  s("kap", { t("\\kappa") }),
+  s("lam", { t("\\lambda") }),
+  s("mu",  { t("\\mu") }),
+  s("nu",  { t("\\nu") }),
+  s("xi",  { t("\\xi") }),
+  s("omi", { t("\\omicron") }),
+  s("pi",  { t("\\pi") }),
+  s("rho", { t("\\rho") }),
+  s("sig", { t("\\sigma") }),
+  s("tau", { t("\\tau") }),
+  s("ups", { t("\\upsilon") }),
+  s("phi", { t("\\phi") }),
+  s("chi", { t("\\chi") }),
+  s("psi", { t("\\psi") }),
+  s("ome", { t("\\omega") }),
 
-  -- 大写希腊字母
-  s("gG", { t("\\Gamma") }),
-  s("gD", { t("\\Delta") }),
-  s("gTh", { t("\\Theta") }),
-  s("gL", { t("\\Lambda") }),
-  s("gX", { t("\\Xi") }),
-  s("gP", { t("\\Pi") }),
-  s("gS", { t("\\Sigma") }),
-  s("gU", { t("\\Upsilon") }),
-  s("gF", { t("\\Phi") }),
-  s("gPs", { t("\\Psi") }),
-  s("gO", { t("\\Omega") }),
-
-  -- \subsubsection{}
-  s("sssec", { t("\\subsubsection{"), i(1), t("}") }),
-
+  -- 大写希腊字母（首字母大写）
+  s("Gam", { t("\\Gamma") }),
+  s("Del", { t("\\Delta") }),
+  s("The", { t("\\Theta") }),
+  s("Lam", { t("\\Lambda") }),
+  s("Xi",  { t("\\Xi") }),
+  s("Pi",  { t("\\Pi") }),
+  s("Sig", { t("\\Sigma") }),
+  s("Ups", { t("\\Upsilon") }),
+  s("Phi", { t("\\Phi") }),
+  s("Psi", { t("\\Psi") }),
+  s("Ome", { t("\\Omega") }),
 
 }
 

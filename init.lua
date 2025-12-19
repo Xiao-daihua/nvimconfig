@@ -19,7 +19,7 @@ vim.opt.relativenumber = true
 -- 高亮方案更简洁
 vim.api.nvim_create_autocmd("ColorScheme", {
   callback = function()
-    vim.cmd("highlight LineNr guifg=#5c6370")  -- 比如 OneDark 的灰色
+    vim.cmd("highlight LineNr guifg=#5c6370") 
     vim.cmd("highlight CursorLineNr guifg=#fab387")
   end
 })
