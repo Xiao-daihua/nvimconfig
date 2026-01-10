@@ -24,12 +24,30 @@ local font_cmd = {
   bf = "\\mathbf{",
 }
 
+-- for _, prefix in ipairs(fonts) do
+--   for c = string.byte("A"), string.byte("Z") do
+--     local letter = string.char(c)
+--     table.insert(math_font_snippets,
+--       s({ trig = prefix .. letter, wordTrig = true, condition = in_math }, {
+--         t(font_cmd[prefix]), t(letter), t("}")
+--       })
+--     )
+--   end
+-- end
 for _, prefix in ipairs(fonts) do
   for c = string.byte("A"), string.byte("Z") do
-    local letter = string.char(c)
+    local upper = string.char(c)
+    local lower = string.char(c + 32) -- ASCII 差 32 得到小写
+    -- 大写字母
     table.insert(math_font_snippets,
-      s({ trig = prefix .. letter, wordTrig = true, condition = in_math }, {
-        t(font_cmd[prefix]), t(letter), t("}")
+      s({ trig = prefix .. upper, wordTrig = true, condition = in_math }, {
+        t(font_cmd[prefix]), t(upper), t("}")
+      })
+    )
+    -- 小写字母
+    table.insert(math_font_snippets,
+      s({ trig = prefix .. lower, wordTrig = true, condition = in_math }, {
+        t(font_cmd[prefix]), t(lower), t("}")
       })
     )
   end
@@ -71,7 +89,6 @@ local env_snippets = {
   -- 广相常用
   s("ten", { t("\\tensor{"), i(1), t("}{"), i(2), t("}") }),
   s("pd",  { t("\\partial_{"), i(1), t("}"), i(0) }),
-  s("par", {t("\\partial"),i(0),})
 
   -- \question{}
   s("qs", { t("\\question{"), i(1), t("}") }),

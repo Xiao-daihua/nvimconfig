@@ -14,8 +14,6 @@ return {
 "",
 "",
 "",
-"",
-"",
       "                Welcome to NVIM              ",
     }
 
@@ -26,6 +24,7 @@ return {
       dashboard.button("e", "  Neo-tree", ":Neotree toggle<CR>"),
       dashboard.button("n", "  Config", ":e ~/.config/nvim/<CR>"),
       dashboard.button("c", "  Phys", ":e ~/Code/Latex_Note/Phys<CR>"),
+      dashboard.button("p", "  Page", ":e ~/Code/Page<CR>"),
       dashboard.button("q", "  Quit", ":qa<CR>"),
     }
 
