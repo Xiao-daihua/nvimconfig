@@ -82,7 +82,6 @@ return {
 				filetypes = { "typst" },
 				root_markers = { ".git", "typst.toml" }, -- 可选但推荐
 				settings = {
-					exportPdf = "onSave", -- 保存时自动导出 PDF
 					semanticTokens = "enable", -- 语义高亮
 					formatterMode = "typstyle", -- or "typstfmt"
 					formatterProseWrap = true, -- wrap lines in content mode
