@@ -56,7 +56,6 @@ return {
   \label{fig:$LABEL}
 \end{figure}
         ]],
-					-- 你可以加以覆盖，例如调整路径行为
 					relative_template_path = true,
 				},
 
@@ -74,7 +73,6 @@ return {
 			},
 		},
 		keys = {
-			-- suggested keymap
 			{ "<leader>p", "<cmd>PasteImage<cr>", desc = "Paste image from system clipboard" },
 		},
 	},

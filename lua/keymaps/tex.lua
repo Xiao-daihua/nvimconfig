@@ -3,18 +3,15 @@
 local opts = { buffer = true, noremap = true, silent = true }
 local keymap = vim.keymap.set
 
--- 锁定快捷键设置
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = "tex",
-  callback = function()
-    vim.keymap.set("i", "<C-e>", "$  $<Left><Left>", { buffer = true })
-    vim.keymap.set("i", "<C-j>", "\\textbf{}<Left>", { buffer = true })
-    vim.keymap.set("i", "<C-h>", "\\hlr{}<Left>",   { buffer = true })
-    vim.keymap.set("i", "<C-k>", "\\textit{}<Left>", { buffer = true })
-    vim.keymap.set("i", "<C-g>", "\\sout{}<Left>",   { buffer = true })
-    vim.keymap.set("i", "<C-r>", "\\cref{}<Left>",   { buffer = true })
-    vim.keymap.set("i", "<C-l>", "\\label{}<Left>",  { buffer = true })
-
-  end,
+	pattern = "tex",
+	callback = function()
+		vim.keymap.set("i", "<C-e>", "$  $<Left><Left>", { buffer = true })
+		vim.keymap.set("i", "<C-j>", "\\textbf{}<Left>", { buffer = true })
+		vim.keymap.set("i", "<C-h>", "\\hlr{}<Left>", { buffer = true })
+		vim.keymap.set("i", "<C-k>", "\\textit{}<Left>", { buffer = true })
+		vim.keymap.set("i", "<C-g>", "\\sout{}<Left>", { buffer = true })
+		vim.keymap.set("i", "<C-r>", "\\cref{}<Left>", { buffer = true })
+		vim.keymap.set("i", "<C-l>", "\\label{}<Left>", { buffer = true })
+	end,
 })
-
