@@ -16,25 +16,34 @@ vim.g.maplocalleader = "\\"
 vim.opt.number = true
 vim.opt.relativenumber = true
 
+vim.opt.fillchars = {
+	vert = " ",
+	horiz = " ",
+	horizup = " ",
+	horizdown = " ",
+	vertleft = " ",
+	vertright = " ",
+}
+
 -- 高亮方案更简洁
 vim.api.nvim_create_autocmd("ColorScheme", {
-  callback = function()
-    vim.cmd("highlight LineNr guifg=#5c6370") 
-    vim.cmd("highlight CursorLineNr guifg=#fab387")
-  end
+	callback = function()
+		vim.cmd("highlight LineNr guifg=#5c6370")
+		vim.cmd("highlight CursorLineNr guifg=#fab387")
+	end,
 })
 
 -- 插入模式自动关闭相对行号（提高可读性）
 vim.api.nvim_create_autocmd("InsertEnter", {
-  callback = function()
-    vim.wo.relativenumber = false
-  end
+	callback = function()
+		vim.wo.relativenumber = false
+	end,
 })
 
 vim.api.nvim_create_autocmd("InsertLeave", {
-  callback = function()
-    vim.wo.relativenumber = true
-  end
+	callback = function()
+		vim.wo.relativenumber = true
+	end,
 })
 
 -- 插入keymaps
@@ -43,4 +52,3 @@ require("keymaps.tex")
 
 -- 插件系统的配置文件
 require("config.lazy")
-

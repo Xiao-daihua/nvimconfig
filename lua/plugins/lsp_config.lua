@@ -80,23 +80,43 @@ return {
 			vim.lsp.config("tinymist", {
 				cmd = { "tinymist" },
 				filetypes = { "typst" },
-				root_markers = { ".git", "typst.toml" }, -- 可选但推荐
+				root_markers = { ".git", "typst.toml" },
 				settings = {
-					semanticTokens = "enable", -- 语义高亮
-					formatterMode = "typstyle", -- or "typstfmt"
-					formatterProseWrap = true, -- wrap lines in content mode
-					formatterPrintWidth = 80, -- limit line length to 80 if possible
-					formatterIndentSize = 4, -- indentation width
+					semanticTokens = "enable",
+					formatterMode = "typstyle",
+					formatterProseWrap = true,
+					formatterPrintWidth = 80,
+					formatterIndentSize = 4,
 				},
+				on_attach = function(client, bufnr)
+					vim.defer_fn(function()
+						local root = client.config.root_dir
+						if root then
+							local candidates = { "main.typ", "thesis.typ", "index.typ" }
+							for _, name in ipairs(candidates) do
+								local path = root .. "/" .. name
+								if vim.fn.filereadable(path) == 1 then
+									-- 关键：用 client:exec_cmd 而不是 vim.lsp.buf.execute_command
+									-- 这样只发给 tinymist，不会广播给 Copilot
+									client:exec_cmd({
+										title = "pin",
+										command = "tinymist.pinMain",
+										arguments = { path },
+									}, { bufnr = bufnr })
+									break
+								end
+							end
+						end
+					end, 100)
+				end,
 			})
-
 			-- LSP常用的快捷键
 			vim.keymap.set("n", "gd", vim.lsp.buf.definition, { desc = "Go to Definition" })
 			vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Hover Info" })
 			-- vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename" })
 			vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code Action" })
 			-- vim.keymap.set("n", "gr", vim.lsp.buf.references, { desc = "References" })
-			vim.keymap.set("n", "<leader>cd", vim.diagnostic.open_float, { desc = "Show diagnostics" })
+			vim.keymap.set("n", "<leader>d", vim.diagnostic.open_float, { desc = "Show diagnostics" })
 		end,
 	},
 }
