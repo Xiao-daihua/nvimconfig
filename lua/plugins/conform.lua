@@ -12,7 +12,6 @@ return {
 			lua = { "stylua" },
 			python = { "black" },
 			tex = { "tex-fmt" },
-			typst = { "typstyle" },
 		},
 	},
 }
