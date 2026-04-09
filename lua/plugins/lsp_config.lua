@@ -92,7 +92,7 @@ return {
 					semanticTokens = "enable",
 					formatterMode = "typstyle",
 					formatterProseWrap = true,
-					formatterPrintWidth = 85,
+					formatterPrintWidth = 70,
 					formatterIndentSize = 4,
 					exportPdf = "onType",
 				},

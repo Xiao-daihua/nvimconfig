@@ -11,7 +11,8 @@ return {
 		formatters_by_ft = {
 			lua = { "stylua" },
 			python = { "black" },
-			tex = { "tex-fmt" },
+			-- tex = { "tex-fmt" },
+			-- markdown = { "prettier" },
 		},
 	},
 }
