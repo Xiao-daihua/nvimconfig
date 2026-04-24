@@ -1,120 +1,146 @@
--- physnav/highlights.lua  v2
--- Richer visual palette: header backgrounds, accent fills, bold states.
+-- physnav/highlights.lua  v3
+-- Redesign: panel-style UI (biblio-inspired).
+-- Each dashboard pane is its own floating window with a rounded border.
+-- Highlights are kept simple: per-pane title tints, a uniform selection colour,
+-- a couple of accent colours for badges, and a muted tone for secondary text.
 
 local M = {}
 
 function M.setup()
-  local function hi(name, opts)
-    vim.api.nvim_set_hl(0, name, opts)
-  end
+  local function hi(name, opts) vim.api.nvim_set_hl(0, name, opts) end
   local dark = vim.o.background == "dark"
 
   if dark then
-    -- Structure
+    -- Panel chrome
     hi("PhysNavBorder",        { fg = "#3b4261" })
-    hi("PhysNavSep",           { fg = "#1e2030" })
-    hi("PhysNavSepBright",     { fg = "#3b4261" })
-    -- Header row  (full-width filled bars)
-    hi("PhysNavHeaderBar",     { fg = "#c0caf5", bg = "#1e2030", bold = true })
-    hi("PhysNavHeaderBarDim",  { fg = "#545c7e", bg = "#1e2030" })
-    hi("PhysNavHeaderTitle",   { fg = "#7aa2f7", bg = "#1e2030", bold = true })
-    hi("PhysNavHeaderCount",   { fg = "#3b4261", bg = "#1e2030" })
-    -- Hint bar
-    hi("PhysNavHint",          { fg = "#414868" })
-    hi("PhysNavHintActive",    { fg = "#7aa2f7" })
-    hi("PhysNavSearch",        { fg = "#e0af68", bold = true })
-    -- Selection in main list
-    hi("PhysNavSelected",      { fg = "#c0caf5", bg = "#1d2030", bold = true })
-    hi("PhysNavSelAccent",     { fg = "#7aa2f7", bg = "#1d2030", bold = true })
+    hi("PhysNavBorderActive",  { fg = "#7aa2f7", bold = true })
+    hi("PhysNavTitle",         { fg = "#7aa2f7", bold = true })
+    hi("PhysNavTitleTags",     { fg = "#e0af68", bold = true })
+    hi("PhysNavTitleList",     { fg = "#7aa2f7", bold = true })
+    hi("PhysNavTitlePreview",  { fg = "#bb9af7", bold = true })
+    hi("PhysNavTitleSearch",   { fg = "#9ece6a", bold = true })
+    hi("PhysNavTitleHints",    { fg = "#565f89", bold = true })
+
+    -- Text
     hi("PhysNavNormal",        { fg = "#a9b1d6" })
-    -- Project types
-    hi("PhysNavLatex",         { fg = "#7aa2f7" })
-    hi("PhysNavLatexSel",      { fg = "#89b4fa", bg = "#1d2030", bold = true })
-    hi("PhysNavTypst",         { fg = "#9ece6a" })
-    hi("PhysNavTypstSel",      { fg = "#a9dc7e", bg = "#1d2030", bold = true })
-    -- PDF / lec
+    hi("PhysNavMuted",         { fg = "#565f89" })
+    hi("PhysNavDim",           { fg = "#414868" })
+    hi("PhysNavAccent",        { fg = "#7aa2f7", bold = true })
+    hi("PhysNavAccentWarm",    { fg = "#e0af68", bold = true })
+    hi("PhysNavAccentPink",    { fg = "#f7768e", bold = true })
+    hi("PhysNavAccentPurple",  { fg = "#bb9af7", bold = true })
+    hi("PhysNavAccentGreen",   { fg = "#9ece6a", bold = true })
+
+    -- Selection (lines highlighted via CursorLine -> PhysNavCursorLine)
+    hi("PhysNavCursorLine",    { bg = "#2a2e42" })
+
+    -- Project type badges
+    hi("PhysNavLatex",         { fg = "#7aa2f7", bold = true })
+    hi("PhysNavTypst",         { fg = "#9ece6a", bold = true })
+
+    -- PDF / lec / git
     hi("PhysNavPDF",           { fg = "#9ece6a" })
-    hi("PhysNavNoPDF",         { fg = "#2a2f45" })
-    hi("PhysNavLecCount",      { fg = "#414868" })
-    -- Git
+    hi("PhysNavNoPDF",         { fg = "#414868" })
+    hi("PhysNavLecCount",      { fg = "#e0af68" })
     hi("PhysNavGitDirty",      { fg = "#e0af68" })
-    hi("PhysNavGitClean",      { fg = "#2a2f45" })
-    hi("PhysNavGitTitle",      { fg = "#9ece6a", bold = true })
+    hi("PhysNavGitClean",      { fg = "#414868" })
+
     -- Category badges
     hi("PhysNavCatEPFL",       { fg = "#f7768e", bold = true })
-    hi("PhysNavCatNotes",      { fg = "#bb9af7" })
-    -- Sidebar tags
-    hi("PhysNavSidebarBar",    { fg = "#7aa2f7", bg = "#1e2030", bold = true })
+    hi("PhysNavCatNotes",      { fg = "#bb9af7", bold = true })
+
+    -- Tag marker / state
+    hi("PhysNavTagMarker",     { fg = "#7aa2f7", bold = true })
     hi("PhysNavTagActive",     { fg = "#e0af68", bold = true })
-    hi("PhysNavTagInactive",   { fg = "#3b4261" })
-    hi("PhysNavTagCursor",     { fg = "#1a1b26", bg = "#7aa2f7", bold = true })
-    hi("PhysNavTagAllActive",  { fg = "#7aa2f7", bold = true })
-    -- Tag colours (cycling)
-    hi("PhysNavTag",           { fg = "#e0af68" })
-    hi("PhysNavKey",           { fg = "#bb9af7", bold = true })
-    hi("PhysNavCourse",        { fg = "#9ece6a" })
-    hi("PhysNavNotes",         { fg = "#bb9af7" })
-    -- Preview panel
-    hi("PhysNavPreviewBar",    { fg = "#c0caf5", bg = "#1a1e2e", bold = true })
-    hi("PhysNavPreviewBarTyp", { fg = "#9ece6a", bg = "#1a1e2e", bold = true })
-    hi("PhysNavPreviewBarTex", { fg = "#7aa2f7", bg = "#1a1e2e", bold = true })
-    hi("PhysNavPreviewKey",    { fg = "#3b4261" })
-    hi("PhysNavPreviewVal",    { fg = "#9aa5ce" })
-    hi("PhysNavMuted",         { fg = "#414868" })
-    -- Status bar
-    hi("PhysNavStatusNormal",  { fg = "#1a1b26", bg = "#7aa2f7", bold = true })
-    hi("PhysNavStatusTags",    { fg = "#1a1b26", bg = "#e0af68", bold = true })
-    hi("PhysNavStatusSep",     { fg = "#7aa2f7", bg = "#1e2030" })
-    hi("PhysNavStatusFill",    { fg = "#3b4261", bg = "#1e2030" })
-    hi("PhysNavStatusInfo",    { fg = "#565f89", bg = "#1e2030" })
-    hi("PhysNavStatusQuery",   { fg = "#e0af68", bg = "#1e2030" })
+    hi("PhysNavTagInactive",   { fg = "#a9b1d6" })
+    hi("PhysNavTagCount",      { fg = "#565f89" })
+
+    -- Tag colour cycle (for per-tag tinting)
+    hi("PhysNavTagC1",         { fg = "#7aa2f7" })
+    hi("PhysNavTagC2",         { fg = "#9ece6a" })
+    hi("PhysNavTagC3",         { fg = "#e0af68" })
+    hi("PhysNavTagC4",         { fg = "#bb9af7" })
+    hi("PhysNavTagC5",         { fg = "#f7768e" })
+    hi("PhysNavTagC6",         { fg = "#7dcfff" })
+
+    -- Search bar
+    hi("PhysNavSearchPrompt",  { fg = "#9ece6a", bold = true })
+    hi("PhysNavSearchText",    { fg = "#e0af68", bold = true })
+    hi("PhysNavSearchHint",    { fg = "#414868", italic = true })
+
+    -- Hints bar
+    hi("PhysNavHintKey",       { fg = "#bb9af7", bold = true })
+    hi("PhysNavHintDesc",      { fg = "#565f89" })
+    hi("PhysNavHintSep",       { fg = "#3b4261" })
+
+    -- Preview fields
+    hi("PhysNavPreviewKey",    { fg = "#565f89" })
+    hi("PhysNavPreviewVal",    { fg = "#a9b1d6" })
+    hi("PhysNavPreviewHead",   { fg = "#bb9af7", bold = true })
+
+    -- Mode badge (tags vs normal)
+    hi("PhysNavModeNormal",    { fg = "#1a1b26", bg = "#7aa2f7", bold = true })
+    hi("PhysNavModeTags",      { fg = "#1a1b26", bg = "#e0af68", bold = true })
   else
-    hi("PhysNavBorder",        { fg = "#ccd0da" })
-    hi("PhysNavSep",           { fg = "#e6e9ef" })
-    hi("PhysNavSepBright",     { fg = "#ccd0da" })
-    hi("PhysNavHeaderBar",     { fg = "#4c4f69", bg = "#e6e9ef", bold = true })
-    hi("PhysNavHeaderBarDim",  { fg = "#9ca0b0", bg = "#e6e9ef" })
-    hi("PhysNavHeaderTitle",   { fg = "#1e66f5", bg = "#e6e9ef", bold = true })
-    hi("PhysNavHeaderCount",   { fg = "#bcc0cc", bg = "#e6e9ef" })
-    hi("PhysNavHint",          { fg = "#bcc0cc" })
-    hi("PhysNavHintActive",    { fg = "#1e66f5" })
-    hi("PhysNavSearch",        { fg = "#df8e1d", bold = true })
-    hi("PhysNavSelected",      { fg = "#4c4f69", bg = "#dce0e8", bold = true })
-    hi("PhysNavSelAccent",     { fg = "#1e66f5", bg = "#dce0e8", bold = true })
+    -- Light theme
+    hi("PhysNavBorder",        { fg = "#bcc0cc" })
+    hi("PhysNavBorderActive",  { fg = "#1e66f5", bold = true })
+    hi("PhysNavTitle",         { fg = "#1e66f5", bold = true })
+    hi("PhysNavTitleTags",     { fg = "#df8e1d", bold = true })
+    hi("PhysNavTitleList",     { fg = "#1e66f5", bold = true })
+    hi("PhysNavTitlePreview",  { fg = "#8839ef", bold = true })
+    hi("PhysNavTitleSearch",   { fg = "#40a02b", bold = true })
+    hi("PhysNavTitleHints",    { fg = "#9ca0b0", bold = true })
+
     hi("PhysNavNormal",        { fg = "#4c4f69" })
-    hi("PhysNavLatex",         { fg = "#1e66f5" })
-    hi("PhysNavLatexSel",      { fg = "#1e66f5", bg = "#dce0e8", bold = true })
-    hi("PhysNavTypst",         { fg = "#40a02b" })
-    hi("PhysNavTypstSel",      { fg = "#40a02b", bg = "#dce0e8", bold = true })
+    hi("PhysNavMuted",         { fg = "#9ca0b0" })
+    hi("PhysNavDim",           { fg = "#bcc0cc" })
+    hi("PhysNavAccent",        { fg = "#1e66f5", bold = true })
+    hi("PhysNavAccentWarm",    { fg = "#df8e1d", bold = true })
+    hi("PhysNavAccentPink",    { fg = "#d20f39", bold = true })
+    hi("PhysNavAccentPurple",  { fg = "#8839ef", bold = true })
+    hi("PhysNavAccentGreen",   { fg = "#40a02b", bold = true })
+
+    hi("PhysNavCursorLine",    { bg = "#dce0e8" })
+
+    hi("PhysNavLatex",         { fg = "#1e66f5", bold = true })
+    hi("PhysNavTypst",         { fg = "#40a02b", bold = true })
+
     hi("PhysNavPDF",           { fg = "#40a02b" })
-    hi("PhysNavNoPDF",         { fg = "#dce0e8" })
-    hi("PhysNavLecCount",      { fg = "#bcc0cc" })
+    hi("PhysNavNoPDF",         { fg = "#bcc0cc" })
+    hi("PhysNavLecCount",      { fg = "#df8e1d" })
     hi("PhysNavGitDirty",      { fg = "#df8e1d" })
-    hi("PhysNavGitClean",      { fg = "#dce0e8" })
-    hi("PhysNavGitTitle",      { fg = "#40a02b", bold = true })
+    hi("PhysNavGitClean",      { fg = "#bcc0cc" })
+
     hi("PhysNavCatEPFL",       { fg = "#d20f39", bold = true })
-    hi("PhysNavCatNotes",      { fg = "#8839ef" })
-    hi("PhysNavSidebarBar",    { fg = "#1e66f5", bg = "#e6e9ef", bold = true })
+    hi("PhysNavCatNotes",      { fg = "#8839ef", bold = true })
+
+    hi("PhysNavTagMarker",     { fg = "#1e66f5", bold = true })
     hi("PhysNavTagActive",     { fg = "#df8e1d", bold = true })
-    hi("PhysNavTagInactive",   { fg = "#ccd0da" })
-    hi("PhysNavTagCursor",     { fg = "#eff1f5", bg = "#1e66f5", bold = true })
-    hi("PhysNavTagAllActive",  { fg = "#1e66f5", bold = true })
-    hi("PhysNavTag",           { fg = "#df8e1d" })
-    hi("PhysNavKey",           { fg = "#8839ef", bold = true })
-    hi("PhysNavCourse",        { fg = "#40a02b" })
-    hi("PhysNavNotes",         { fg = "#8839ef" })
-    hi("PhysNavPreviewBar",    { fg = "#4c4f69", bg = "#eff1f5", bold = true })
-    hi("PhysNavPreviewBarTyp", { fg = "#40a02b", bg = "#eff1f5", bold = true })
-    hi("PhysNavPreviewBarTex", { fg = "#1e66f5", bg = "#eff1f5", bold = true })
-    hi("PhysNavPreviewKey",    { fg = "#bcc0cc" })
-    hi("PhysNavPreviewVal",    { fg = "#6c6f85" })
-    hi("PhysNavMuted",         { fg = "#bcc0cc" })
-    hi("PhysNavStatusNormal",  { fg = "#eff1f5", bg = "#1e66f5", bold = true })
-    hi("PhysNavStatusTags",    { fg = "#eff1f5", bg = "#df8e1d", bold = true })
-    hi("PhysNavStatusSep",     { fg = "#1e66f5", bg = "#e6e9ef" })
-    hi("PhysNavStatusFill",    { fg = "#bcc0cc", bg = "#e6e9ef" })
-    hi("PhysNavStatusInfo",    { fg = "#9ca0b0", bg = "#e6e9ef" })
-    hi("PhysNavStatusQuery",   { fg = "#df8e1d", bg = "#e6e9ef" })
+    hi("PhysNavTagInactive",   { fg = "#4c4f69" })
+    hi("PhysNavTagCount",      { fg = "#9ca0b0" })
+
+    hi("PhysNavTagC1",         { fg = "#1e66f5" })
+    hi("PhysNavTagC2",         { fg = "#40a02b" })
+    hi("PhysNavTagC3",         { fg = "#df8e1d" })
+    hi("PhysNavTagC4",         { fg = "#8839ef" })
+    hi("PhysNavTagC5",         { fg = "#d20f39" })
+    hi("PhysNavTagC6",         { fg = "#04a5e5" })
+
+    hi("PhysNavSearchPrompt",  { fg = "#40a02b", bold = true })
+    hi("PhysNavSearchText",    { fg = "#df8e1d", bold = true })
+    hi("PhysNavSearchHint",    { fg = "#bcc0cc", italic = true })
+
+    hi("PhysNavHintKey",       { fg = "#8839ef", bold = true })
+    hi("PhysNavHintDesc",      { fg = "#9ca0b0" })
+    hi("PhysNavHintSep",       { fg = "#bcc0cc" })
+
+    hi("PhysNavPreviewKey",    { fg = "#9ca0b0" })
+    hi("PhysNavPreviewVal",    { fg = "#4c4f69" })
+    hi("PhysNavPreviewHead",   { fg = "#8839ef", bold = true })
+
+    hi("PhysNavModeNormal",    { fg = "#eff1f5", bg = "#1e66f5", bold = true })
+    hi("PhysNavModeTags",      { fg = "#eff1f5", bg = "#df8e1d", bold = true })
   end
 end
 

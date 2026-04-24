@@ -13,7 +13,6 @@ return {
 			"",
 			"",
 			"",
-			"",
 			"                Welcome to NVIM              ",
 		}
 
@@ -22,9 +21,9 @@ return {
 			dashboard.button("l", "  Lazy", ":Lazy<CR>"),
 			dashboard.button("m", "  Mason", ":Mason<CR>"),
 			dashboard.button("e", "  Neo-tree", ":Neotree toggle<CR>"),
-			dashboard.button("n", "  Config", ":e ~/.config/nvim/<CR>"),
-			dashboard.button("c", "  Phys", ":PhysNav<CR>"),
-			dashboard.button("p", "  Page", ":e ~/Code/Page<CR>"),
+			dashboard.button("c", "  Config", ":e ~/.config/nvim/<CR>"),
+			dashboard.button("n", "  Phys", ":PhysNav<CR>"),
+			dashboard.button("p", "  Page", ":Biblio<CR>"),
 			dashboard.button("q", "  Quit", ":qa<CR>"),
 		}
 

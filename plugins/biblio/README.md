@@ -71,6 +71,7 @@ All keymaps are buffer-local — zero global pollution.
 | `np` | New paper (paste BibTeX, preview, accept/discard) |
 | `nt` | New topic |
 | `/` | Focus the search bar (starts in insert) |
+| `j` in search normal | Jump from search bar into topics pane |
 | `<Esc>` in search insert | Drop to normal mode (search bar stays open) |
 | `<CR>` in search | Commit query, jump to results pane |
 | `<C-u>` in search insert | Clear query |
@@ -79,8 +80,13 @@ All keymaps are buffer-local — zero global pollution.
 | `h` / `l` | Move one pane left / right |
 | `j` / `k` | Down / up within a pane |
 | `<CR>` in results pane | Open selected item for editing |
+| `R` on a tag | Rename tag across all topics |
+| `D` on a tag | Delete tag from all topics (confirmed) |
+| `m` on a topic | Mark topic for batch operations (shows `✓`) |
+| `M` on topics pane | Unmark all |
+| `a` on topics pane | Apply tag(s) to marked topics (or cursor topic) |
 | `d` | Delete selected item (with confirmation) |
-| `s` | Start `bundle exec jekyll serve` |
+| `s` | Toggle jekyll serve (start if stopped, stop if running) |
 | `S` | Open preview in browser |
 | `gc` | Commit changes (opens commit UI) |
 | `gp` | Push current branch |
@@ -91,12 +97,26 @@ All keymaps are buffer-local — zero global pollution.
 
 **Mode convention (all input floats):** `<Esc>` always drops you from insert to normal mode — it never closes the UI. Use `q` in normal mode to close / cancel.
 
-### Jekyll preview
+### Managing tags
 
-Press `s` on the dashboard, or `:Biblio serve`, to start a jekyll server in the background. The job runs under `vim.fn.jobstart` so neovim stays responsive. Output is silent unless the process fails, in which case the last few stderr lines surface via `vim.notify`.
+Your tags accumulate fast and sometimes you want to clean up. biblio can edit tags across all your topic files in one shot, surgically (the markdown body is untouched).
+
+**Rename a tag** — put the cursor on a tag in the Tags pane and press `R`. Enter the new name. Every topic that had the old tag now has the new one (duplicates are de-duped if both existed).
+
+**Delete a tag** — `D` on a tag prompts for confirmation, then removes that tag from every topic that had it.
+
+**Tag multiple topics at once** — on the Topics pane, press `m` on each topic you want to tag (a `✓` appears next to its title). Press `a` to open the multi-select tag picker — existing tags plus an option to create a new one. All marked topics get all selected tags. `M` on the Topics pane clears the selection.
+
+You can also press `a` without marking anything; it then applies to just the topic under the cursor.
+
+
+
+Press `s` on the dashboard to **toggle** `bundle exec jekyll serve` — first press starts it in the background, next press stops it. The hints bar at the bottom of the dashboard shows `▶ s serve` when idle, `■ s serve` when running.
+
+The job runs under `vim.fn.jobstart` so neovim stays responsive. Output is silent unless the process fails, in which case the last few stderr lines surface via `vim.notify`.
 
 - `:Biblio serve_status` — is it running?
-- `:Biblio serve_stop` — stop it.
+- `:Biblio serve_stop` — stop it explicitly (same as pressing `s` again).
 - `:Biblio preview` (or `S` on the dashboard) — open `http://127.0.0.1:4000/` in your OS default browser (tries `xdg-open`, `open`, `wslview`).
 
 Requires `bundle` on your PATH. Doesn't install or update gems — run `bundle install` manually the first time.

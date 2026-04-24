@@ -114,6 +114,15 @@ function M.stop()
   util.notify("jekyll stop requested.")
 end
 
+--- Toggle: start if stopped, stop if running.
+function M.toggle()
+  if M.is_running() then
+    M.stop()
+  else
+    M.start()
+  end
+end
+
 --- Show status.
 function M.status()
   if M.is_running() then

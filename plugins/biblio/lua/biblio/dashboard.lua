@@ -125,7 +125,10 @@ local function render_search()
 end
 
 local function render_hints()
-  local line1 = "  np new paper   nt new topic   / search   s serve   gc commit   gs sync   ? help   q quit"
+  local serve_marker = require("biblio.serve").is_running() and "■" or "▶"
+  local line1 = string.format(
+    "  np new   nt topic   / search   %s s serve   gc commit   m mark  a tag   ? help   q quit",
+    serve_marker)
   set_lines(S.bufs.hints, { line1 })
 end
 
@@ -164,7 +167,10 @@ local function render_topics()
   if #view == 0 then
     table.insert(lines, "  (none)")
   else
-    for _, t in ipairs(view) do table.insert(lines, "  " .. (t.title or t.slug)) end
+    for _, t in ipairs(view) do
+      local marker = S.selected_topics[t.path] and "✓ " or "  "
+      table.insert(lines, marker .. (t.title or t.slug))
+    end
   end
   set_lines(S.bufs.topics, lines)
 end
@@ -338,11 +344,21 @@ local function show_help()
     row(km.focus_papers,  "Focus Papers pane"),
     row("h / l",          "Move one pane left / right"),
     row("j / k",          "Down / up within a pane"),
+    row("j in search",    "Jump from search bar into topics pane"),
     row(km.open_item,     "Open selected item for editing"),
     "",
     "  CREATE",
     row(km.new_paper,     "New paper (paste BibTeX; preview before saving)"),
     row(km.new_topic,     "New topic (title + tag picker)"),
+    "",
+    "  TAGS (on Tags pane)",
+    row("R",              "Rename tag under cursor (updates all topics)"),
+    row("D",              "Delete tag from all topics (confirmed)"),
+    "",
+    "  BATCH-TAG TOPICS (on Topics pane)",
+    row("m",              "Mark / unmark topic for batch op (✓ shown)"),
+    row("M",              "Unmark all"),
+    row("a",              "Add tag(s) to marked topics (or cursor topic)"),
     "",
     "  IN EDITOR (when editing a topic .md file)",
     row("<C-p>",          "Pick a paper and insert [Title](/papers/slug/)"),
@@ -351,10 +367,11 @@ local function show_help()
     row(km.search,        "Focus the search bar (starts in insert mode)"),
     row("<Esc> insert",   "Drop to normal mode (stays in search bar)"),
     row("<CR>",           "Commit query, jump to results pane"),
+    row("j normal",       "Jump from search into topics pane"),
     row("<C-u> insert",   "Clear the query"),
     "",
     "  JEKYLL PREVIEW",
-    row(km.serve,         "Start `bundle exec jekyll serve` in background"),
+    row(km.serve,         "Toggle jekyll serve (start if stopped, stop if running)"),
     row(km.preview,       "Open http://127.0.0.1:4000/ in default browser"),
     "",
     "  GIT",
@@ -407,6 +424,108 @@ local function map_buf(buf, lhs, rhs, mode)
     { buffer = buf, silent = true, nowait = true })
 end
 
+-- ─── tag & batch operations ────────────────────────────────────────────────
+
+--- Prompt the user to rename the tag under the cursor in the tags pane.
+local function tag_rename_prompt()
+  local tag = item_under_cursor("tags")
+  if type(tag) ~= "string" or tag == "" then
+    util.notify("Put the cursor on a tag first (not 'All').", vim.log.levels.WARN)
+    return
+  end
+
+  ui.line_input({
+    title  = " Rename tag ",
+    prompt = "Rename tag '" .. tag .. "' to:",
+    default = tag,
+  }, function(new_name)
+    if new_name == "" or new_name == tag then
+      util.notify("Rename cancelled.")
+      return
+    end
+    local n = require("biblio.tags").rename(tag, new_name)
+    util.notify(string.format("Renamed tag '%s' → '%s' in %d topic(s).",
+      tag, new_name, n))
+    if S.selected_tag == tag then S.selected_tag = new_name end
+    M.refresh()
+  end)
+end
+
+--- Delete the tag under the cursor (with confirmation).
+local function tag_delete_prompt()
+  local tag = item_under_cursor("tags")
+  if type(tag) ~= "string" or tag == "" then
+    util.notify("Put the cursor on a tag first (not 'All').", vim.log.levels.WARN)
+    return
+  end
+  if not ui.confirm(string.format("Remove tag '%s' from all topics?", tag)) then
+    return
+  end
+  local n = require("biblio.tags").delete(tag)
+  util.notify(string.format("Removed '%s' from %d topic(s).", tag, n))
+  if S.selected_tag == tag then S.selected_tag = "" end
+  M.refresh()
+end
+
+--- Toggle multi-select on the topic under cursor.
+local function topic_toggle_select()
+  local t = item_under_cursor("topics")
+  if type(t) ~= "table" or not t.path then return end
+  if S.selected_topics[t.path] then
+    S.selected_topics[t.path] = nil
+  else
+    S.selected_topics[t.path] = true
+  end
+  render_topics()
+end
+
+--- Clear all multi-selected topics.
+local function topic_clear_selection()
+  S.selected_topics = {}
+  render_topics()
+end
+
+--- Apply a tag to all multi-selected topics (or just the one under cursor
+--- if nothing is multi-selected).
+local function topic_apply_tag()
+  local targets = {}
+  for path, _ in pairs(S.selected_topics) do table.insert(targets, path) end
+  if #targets == 0 then
+    local t = item_under_cursor("topics")
+    if type(t) == "table" and t.path then
+      table.insert(targets, t.path)
+    end
+  end
+  if #targets == 0 then
+    util.notify("No topics selected. Press m on topics to select.", vim.log.levels.WARN)
+    return
+  end
+
+  -- Offer existing tags + allow creating new via line_input
+  local all_tags = {}
+  for _, t in ipairs(S.data.tags) do table.insert(all_tags, t) end
+
+  ui.multi_select({
+    title      = string.format(" Tag %d topic(s) ", #targets),
+    items      = all_tags,
+    allow_new  = true,
+    new_prompt = "New tag:",
+  }, function(chosen)
+    if #chosen == 0 then
+      util.notify("No tags chosen.")
+      return
+    end
+    local total = 0
+    for _, tag in ipairs(chosen) do
+      total = total + require("biblio.tags").apply_to_topics(targets, tag)
+    end
+    util.notify(string.format("Applied %d tag(s) across %d topic(s) (%d updates).",
+      #chosen, #targets, total))
+    S.selected_topics = {}
+    M.refresh()
+  end)
+end
+
 local function attach_pane_keymaps(buf, pane)
   local km = cfg.options.keymaps
   map_buf(buf, km.new_paper, function()
@@ -428,12 +547,28 @@ local function attach_pane_keymaps(buf, pane)
   map_buf(buf, km.open_item,    function() open_selected(pane) end)
   map_buf(buf, km.delete_item,  function() do_delete(pane) end)
 
-  -- Jekyll preview + git
-  map_buf(buf, km.serve,   function() require("biblio.serve").start() end)
+  -- Jekyll preview + git. `serve` toggles (start if stopped, stop if running).
+  -- After toggling we re-render the hints bar so the ▶/■ indicator updates.
+  map_buf(buf, km.serve, function()
+    require("biblio.serve").toggle()
+    -- Give the job state a moment to settle before we re-render.
+    vim.schedule(function() if S then render_hints() end end)
+  end)
   map_buf(buf, km.preview, function() require("biblio.serve").open_browser() end)
   map_buf(buf, km.commit,  function() require("biblio.git").prompt_commit() end)
   map_buf(buf, km.push,    function() require("biblio.git").push() end)
   map_buf(buf, km.sync,    function() require("biblio.git").prompt_commit({ push = true }) end)
+
+  -- Pane-specific operations.
+  if pane == "tags" then
+    map_buf(buf, "R", tag_rename_prompt)
+    map_buf(buf, "D", tag_delete_prompt)   -- uppercase D to avoid collision with `d` (delete item)
+  elseif pane == "topics" then
+    map_buf(buf, "m", topic_toggle_select)      -- mark for batch ops
+    map_buf(buf, "M", topic_clear_selection)    -- unmark all
+    map_buf(buf, "a", topic_apply_tag)          -- add tag to marked topics (or current)
+  end
+
   map_buf(buf, "h", function()
     if pane == "topics" then vim.api.nvim_set_current_win(S.wins.tags)
     elseif pane == "papers" then vim.api.nvim_set_current_win(S.wins.topics) end
@@ -467,6 +602,15 @@ local function attach_search_keymaps(buf)
   map_buf(buf, km.focus_tags,   function() vim.api.nvim_set_current_win(S.wins.tags)   end, "n")
   map_buf(buf, km.focus_topics, function() vim.api.nvim_set_current_win(S.wins.topics) end, "n")
   map_buf(buf, km.focus_papers, function() vim.api.nvim_set_current_win(S.wins.papers) end, "n")
+
+  -- `j` from the search bar (normal mode) jumps to the first result in the
+  -- topics pane. Since the search bar is a single line, `j` doing anything
+  -- else would be a no-op — using it to "drop into results" matches how
+  -- users naturally move "down" out of the search bar.
+  map_buf(buf, "j", function()
+    vim.api.nvim_set_current_win(S.wins.topics)
+    pcall(vim.api.nvim_win_set_cursor, S.wins.topics, { 1, 0 })
+  end, "n")
 end
 
 local function on_search_text_changed()
@@ -585,6 +729,7 @@ function M.open()
     data = scanner.scan_all(),
     selected_tag = "",
     selected_topic = nil,
+    selected_topics = {},   -- path -> true for multi-selected topics
     topics_view = {},
     papers_view = {},
     search_query = "",
