@@ -5,6 +5,7 @@ return {
 		version = "1.*",
 		opts = {
 			open_cmd = 'open -a "Safari" %s',
+			follow_cursor = false,
 		},
 		vim.keymap.set("n", "<leader>tp", ":TypstPreviewToggle<CR>", { desc = "Toggle Typst Preview" }),
 		vim.keymap.set("n", "<leader>tf", vim.lsp.buf.format, { desc = "Format" }),

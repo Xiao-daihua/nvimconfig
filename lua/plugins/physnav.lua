@@ -3,7 +3,8 @@ return {
 	lazy = false,
 	config = function()
 		require("physnav").setup({
-			root = vim.fn.expand("~/Code/Notes/Phys"), -- 你的笔记根目录
+			root = vim.fn.expand("~/Code/Notes/Phys"),
+			categories = { "EPFL_lecture", "Notes", "Pieces" },
 		})
 	end,
 	keys = {

@@ -46,6 +46,9 @@ vim.api.nvim_create_autocmd("InsertLeave", {
 	end,
 })
 
+vim.opt.spell = true
+vim.opt.spelllang = { "en_us" }
+
 -- 插入keymaps
 require("keymaps.general")
 require("keymaps.tex")
