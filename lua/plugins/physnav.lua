@@ -4,7 +4,7 @@ return {
 	config = function()
 		require("physnav").setup({
 			root = vim.fn.expand("~/Code/Notes/Phys"),
-			categories = { "EPFL_lecture", "Notes", "Pieces" },
+			categories = { "EPFL_lecture", "Notes", "RG" },
 		})
 	end,
 	keys = {

@@ -4,7 +4,10 @@ return {
 		lazy = false,
 		version = "1.*",
 		opts = {
-			open_cmd = 'open -a "Safari" %s',
+			open_cmd = "open -a Safari %s && "
+				.. "(sleep 0.4 && "
+				.. "/usr/local/bin/aerospace resize smart +100"
+				.. ") &",
 			follow_cursor = false,
 		},
 		vim.keymap.set("n", "<leader>tp", ":TypstPreviewToggle<CR>", { desc = "Toggle Typst Preview" }),
