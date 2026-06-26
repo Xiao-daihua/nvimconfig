@@ -4,6 +4,10 @@ return {
 	config = function()
 		require("biblio").setup({
 			blog_root = vim.fn.expand("~/Code/Page/Xiao-daihua.github.io"),
+			insert_keymaps = {
+				paper = "<C-r>",
+				topic = "<C-l>",
+			},
 		})
 	end,
 	keys = {

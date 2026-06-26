@@ -1,12 +1,19 @@
--- biblio.nvim :: reference
+-- biblio.nvim :: topic_ref
 --
 -- When editing a topic .md file in _database/, this module provides a picker
--- that fuzzy-searches your existing papers and inserts a link in the form
+-- that fuzzy-searches your *other* topics and inserts a wikilink in the form
 --
---     [Title](/papers/slug/)
+--     [[Topic Title]]
 --
--- at the current cursor position. The picker is a floating search bar plus
--- a scrollable result list; typing filters live.
+-- at the current cursor position. This mirrors reference.lua (which inserts
+-- paper links) but targets topic-to-topic connections instead. The site's
+-- Library graph resolves [[Topic Title]] automatically, so the title is all
+-- we need to write.
+--
+-- The picker is a floating search bar plus a scrollable result list; typing
+-- filters live. The whole search line IS the query (no in-buffer prompt
+-- symbol to accidentally edit); a non-editable "› " prompt is drawn as
+-- virtual text instead.
 
 local cfg = require("biblio.config")
 local scanner = require("biblio.scanner")
@@ -15,61 +22,33 @@ local ui = require("biblio.ui")
 
 local M = {}
 
-local NS = vim.api.nvim_create_namespace("biblio_ref_prompt")
+local NS = vim.api.nvim_create_namespace("biblio_topicref_prompt")
 
----@class RefPickerState
----@field papers BiblioPaper[]     Full list
----@field filtered BiblioPaper[]   Current filtered view
----@field target_buf integer       The topic .md buffer we'll insert into
----@field target_win integer       The window containing target_buf
----@field insert_row integer       1-indexed row in target_buf
----@field insert_col integer       0-indexed col in target_buf
----@field was_insert_mode boolean  Whether the target was in insert mode
----@field search_buf integer
----@field search_win integer
----@field list_buf integer
----@field list_win integer
-
----@param p BiblioPaper
+---@param t BiblioTopic
 ---@return string
-local function format_row(p)
-	local year = tostring(p.year or "")
-	if year == "" then
-		year = "----"
+local function format_row(t)
+	local tags = ""
+	if t.tags and #t.tags > 0 then
+		tags = "[" .. table.concat(t.tags, ", ") .. "]"
 	end
-	local authors
-	if p.authors and #p.authors > 0 then
-		authors = p.authors[1]
-		if #p.authors > 1 then
-			authors = authors .. " et al."
-		end
-	else
-		authors = "(unknown)"
-	end
-	return string.format("  %-4s  %-22s  %s", year, authors, p.title or p.slug)
+	return string.format("  %-40s  %s", t.title or t.slug, tags)
 end
 
----@param p BiblioPaper
+---@param t BiblioTopic
 ---@param query string
 ---@return boolean
-local function matches(p, query)
+local function matches(t, query)
 	if query == "" then
 		return true
 	end
 	local q = query:lower()
-	local hay = (p.title or "")
+	local hay = (t.title or "")
 		.. "\n"
-		.. table.concat(p.authors or {}, " ")
+		.. table.concat(t.tags or {}, " ")
 		.. "\n"
-		.. tostring(p.year or "")
+		.. (t.slug or "")
 		.. "\n"
-		.. (p.slug or "")
-		.. "\n"
-		.. (p.journal or "")
-		.. "\n"
-		.. (p.arxiv or "")
-		.. "\n"
-		.. (p.doi or "")
+		.. (t.body or "")
 	return hay:lower():find(q, 1, true) ~= nil
 end
 
@@ -78,8 +57,8 @@ local function render_list(S)
 	if #S.filtered == 0 then
 		table.insert(lines, "  (no matches)")
 	else
-		for _, p in ipairs(S.filtered) do
-			table.insert(lines, format_row(p))
+		for _, t in ipairs(S.filtered) do
+			table.insert(lines, format_row(t))
 		end
 	end
 	vim.bo[S.list_buf].modifiable = true
@@ -89,24 +68,20 @@ end
 
 local function recompute(S, query)
 	S.filtered = {}
-	for _, p in ipairs(S.papers) do
-		if matches(p, query) then
-			table.insert(S.filtered, p)
+	for _, t in ipairs(S.topics) do
+		if matches(t, query) then
+			table.insert(S.filtered, t)
 		end
 	end
 	table.sort(S.filtered, function(a, b)
-		-- Heuristic: newer first, otherwise title.
-		local ay = tonumber(a.year) or 0
-		local by = tonumber(b.year) or 0
-		if ay ~= by then
-			return ay > by
-		end
-		return (a.title or "") < (b.title or "")
+		return (a.title or a.slug or "") < (b.title or b.slug or "")
 	end)
 	render_list(S)
-	-- Reset cursor on the list to the first row when filter changes.
 	if #S.filtered > 0 then
 		pcall(vim.api.nvim_win_set_cursor, S.list_win, { 1, 0 })
+		if vim.api.nvim_win_is_valid(S.list_win) then
+			vim.wo[S.list_win].cursorline = true
+		end
 	end
 end
 
@@ -135,51 +110,45 @@ local function close_picker(S)
 	end
 	if S.target_win and vim.api.nvim_win_is_valid(S.target_win) then
 		vim.api.nvim_set_current_win(S.target_win)
-		-- Put cursor back where it was, and resume insert if needed.
 		pcall(vim.api.nvim_win_set_cursor, S.target_win, { S.insert_row, S.insert_col })
 		if S.was_insert_mode then
 			vim.schedule(function()
-				-- Re-entering insert at the cursor. "a" keeps us at current column.
 				vim.cmd("startinsert")
-				-- If the column was at end-of-line we'd need startinsert!, but we
-				-- restore explicitly so regular startinsert is fine.
 			end)
 		end
 	end
 end
 
---- Insert the markdown link for `p` at the saved cursor position.
----@param S RefPickerState
----@param p BiblioPaper
-local function do_insert(S, p)
-	local text = string.format("[%s](%s%s/)", p.title or p.slug, cfg.options.paper_url_prefix, p.slug)
+--- Insert the wikilink for `t` at the saved cursor position.
+---@param S table
+---@param t BiblioTopic
+local function do_insert(S, t)
+	local text = string.format("[[%s]]", t.title or t.slug)
 
 	local row, col = S.insert_row, S.insert_col -- 1-indexed row, 0-indexed col
 	local lines = vim.api.nvim_buf_get_lines(S.target_buf, row - 1, row, false)
 	local line = lines[1] or ""
-	-- Clamp col in case the line is shorter (shouldn't happen, but safe).
 	if col > #line then
 		col = #line
 	end
 	local new_line = line:sub(1, col) .. text .. line:sub(col + 1)
 	vim.api.nvim_buf_set_lines(S.target_buf, row - 1, row, false, { new_line })
 
-	-- Move cursor to end of inserted text.
 	S.insert_col = col + #text
 	close_picker(S)
 end
 
---- Pick the currently highlighted paper in the list.
+--- Pick the currently highlighted topic in the list.
 local function pick_current(S)
 	if #S.filtered == 0 then
 		return
 	end
 	local row = vim.api.nvim_win_get_cursor(S.list_win)[1]
-	local p = S.filtered[row]
-	if not p then
+	local t = S.filtered[row]
+	if not t then
 		return
 	end
-	do_insert(S, p)
+	do_insert(S, t)
 end
 
 --- Entry point. Call this while the cursor is in a topic .md file.
@@ -188,16 +157,20 @@ function M.pick_and_insert()
 	local target_win = vim.api.nvim_get_current_win()
 	local cursor = vim.api.nvim_win_get_cursor(target_win)
 	local mode = vim.api.nvim_get_mode().mode
+	local cur_path = vim.api.nvim_buf_get_name(target_buf)
 
-	-- Scan papers. Always fresh — the user might have added papers in this same
-	-- session and we want them available.
-	local papers = scanner.scan_papers()
-	if #papers == 0 then
-		util.notify("No papers found under " .. cfg.papers_path(), vim.log.levels.WARN)
+	local all = scanner.scan_topics()
+	local topics = {}
+	for _, t in ipairs(all) do
+		if t.path ~= cur_path then
+			table.insert(topics, t)
+		end
+	end
+	if #topics == 0 then
+		util.notify("No other topics found under " .. cfg.database_path(), vim.log.levels.WARN)
 		return
 	end
 
-	-- Leave insert mode before opening floats, so they can take focus cleanly.
 	if mode:match("^i") then
 		vim.cmd("stopinsert")
 	end
@@ -211,7 +184,7 @@ function M.pick_and_insert()
 	local row = math.floor((total_lines - (search_h + max_list_h + 4)) / 2)
 	local col = math.floor((total_cols - w) / 2)
 
-	local search_buf = ui.scratch_buf({ filetype = "biblio_ref_search" })
+	local search_buf = ui.scratch_buf({ filetype = "biblio_topicref_search" })
 	local search_win = vim.api.nvim_open_win(search_buf, true, {
 		relative = "editor",
 		row = row,
@@ -220,14 +193,14 @@ function M.pick_and_insert()
 		height = search_h,
 		style = "minimal",
 		border = "rounded",
-		title = " Insert paper reference ",
+		title = " Link topic [[…]] ",
 		title_pos = "center",
 	})
 
-	local list_buf = ui.scratch_buf({ filetype = "biblio_ref_list" })
+	local list_buf = ui.scratch_buf({ filetype = "biblio_topicref_list" })
 	local list_win = vim.api.nvim_open_win(list_buf, false, {
 		relative = "editor",
-		row = row + search_h + 2, -- below search float incl. its borders
+		row = row + search_h + 2,
 		col = col,
 		width = w - 2,
 		height = max_list_h,
@@ -245,7 +218,7 @@ function M.pick_and_insert()
 	vim.wo[list_win].cursorline = true
 
 	local S = {
-		papers = papers,
+		topics = topics,
 		filtered = {},
 		target_buf = target_buf,
 		target_win = target_win,
@@ -258,17 +231,16 @@ function M.pick_and_insert()
 		list_win = list_win,
 	}
 
-	-- Seed: genuinely empty editable line; prompt is virtual text only.
+	-- Start with a genuinely empty editable line; prompt is virtual text only.
 	vim.api.nvim_buf_set_lines(search_buf, 0, -1, false, { "" })
 	draw_prompt(S)
 	vim.api.nvim_win_set_cursor(search_win, { 1, 0 })
 	recompute(S, "")
 
-	-- Live filter on typing
 	vim.api.nvim_create_autocmd({ "TextChangedI", "TextChanged" }, {
 		buffer = search_buf,
 		callback = function()
-			-- Keep the search buffer to a single line.
+			-- Keep the search buffer to a single line; collapse any stray newlines.
 			local ls = vim.api.nvim_buf_get_lines(search_buf, 0, -1, false)
 			if #ls > 1 then
 				vim.api.nvim_buf_set_lines(search_buf, 0, -1, false, { table.concat(ls, " ") })
@@ -282,7 +254,6 @@ function M.pick_and_insert()
 		vim.keymap.set(mode_ or "n", lhs, rhs, { buffer = buf, silent = true, nowait = true })
 	end
 
-	-- Search buffer: arrow / Ctrl-n/p navigate list without leaving input.
 	local function move_list(delta)
 		if #S.filtered == 0 then
 			return
@@ -331,7 +302,6 @@ function M.pick_and_insert()
 		vim.api.nvim_win_set_cursor(search_win, { 1, 0 })
 		recompute(S, "")
 	end, "i")
-	-- Normal mode fallbacks
 	map(search_buf, "<Esc>", function()
 		close_picker(S)
 	end, "n")
@@ -339,7 +309,6 @@ function M.pick_and_insert()
 		close_picker(S)
 	end, "n")
 
-	-- List buffer: j/k navigate, Enter picks, Esc closes.
 	map(list_buf, "<CR>", function()
 		pick_current(S)
 	end)
@@ -348,6 +317,18 @@ function M.pick_and_insert()
 	end)
 	map(list_buf, "q", function()
 		close_picker(S)
+	end)
+	map(list_buf, "j", function()
+		move_list(1)
+	end)
+	map(list_buf, "k", function()
+		move_list(-1)
+	end)
+	map(list_buf, "<Down>", function()
+		move_list(1)
+	end)
+	map(list_buf, "<Up>", function()
+		move_list(-1)
 	end)
 	map(list_buf, "i", function()
 		vim.api.nvim_set_current_win(search_win)
@@ -358,7 +339,6 @@ function M.pick_and_insert()
 		vim.cmd("startinsert!")
 	end)
 
-	-- Start in insert mode on the search bar so the user can just start typing.
 	vim.cmd("startinsert!")
 end
 

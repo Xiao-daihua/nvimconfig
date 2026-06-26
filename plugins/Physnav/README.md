@@ -83,28 +83,71 @@ Categories scanned: `EPFL_lecture`, `Notes`.
 
 ---
 
+## Layout
+
+Four panes:
+
+```
+╭─ search ─────────────────────────────────────────────╮
+│  /  type to filter…                                  │
+╰──────────────────────────────────────────────────────╯
+╭─ tags ──╮ ╭─ notes 9/24 ─────────────────────────────╮
+│ ● All   │ │   ▾ WIP   (3)                            │
+│ ○ qft   │ │       QFT_renorm                         │
+│ ○ cft   │ │   ▸ IDEA  (5)                            │
+│ …       │ │   ▸ SHELF (16)                           │
+╰─────────╯ ╰──────────────────────────────────────────╯
+╭─ keys ───────────────────────────────────────────────╮
+│  j/k move · l open · h fold · w/i/x status · / search │
+╰──────────────────────────────────────────────────────╯
+```
+
+- **search** (top) — press `/` to focus it, type to filter live, `Enter`/`Esc` back to the list.
+- **tags** (left) — press `t` (or `Tab`) to enter; `j`/`k` move, `Enter`/`Space` toggle a tag, `a` switches AND/OR, `t`/`q`/`Esc` back to the list. Selecting tags filters the notes shown.
+- **notes** (main) — the status board; the only pane you navigate with hjkl.
+- **keys** (bottom) — a live cheat-sheet that changes with the active pane.
+
+## How it's organised
+
+The notes pane groups notes into three **status buckets**:
+
+| Bucket  | Meaning                                            |
+|---------|----------------------------------------------------|
+| `WIP`   | actively writing — **open by default**             |
+| `IDEA`  | opened-but-not-started; **new notes land here**     |
+| `SHELF` | everything else — finished or set aside            |
+
+`IDEA` and `SHELF` start folded. There is no "done": a note is on your mind
+(`WIP`), waiting (`IDEA`), or off your plate (`SHELF`). Status is saved in the
+JSON data file and survives rescans.
+
+## Navigation (in the notes pane)
+
+| Key        | On a bucket header   | On a note         |
+|------------|----------------------|-------------------|
+| `j` / `k` | move up / down (headers + visible notes; blanks skipped) ||
+| `l`        | unfold the bucket    | open the note     |
+| `h`        | fold the bucket      | fold the note's bucket |
+| `Enter`    | toggle fold          | open the note     |
+| `gg` / `G`| first / last item    | first / last item |
+
 ## Keybinds
 
-| Key          | Action                                  |
-|--------------|-----------------------------------------|
-| `j` / `k`   | move down / up                          |
-| `Enter`      | open project main file                  |
-| `p`          | open compiled PDF                       |
-| `c`          | compile in terminal split               |
-| `t`          | edit tags for selected project          |
-| `/`          | open search prompt                      |
-| `T`          | toggle tag-browser mode                 |
-| `Space`      | toggle tag filter (in tag-browser mode) |
-| `<C-c>`      | clear search + all tag filters          |
-| `r`          | rescan projects                         |
-| `q` / `Esc` | quit (or clear filters first)           |
-| `?`          | show help                               |
-
-**Search** (`/`): a `vim.ui.input` prompt appears. Type your query, press Enter
-to apply, or leave blank to clear. The filter is shown in the header.
-
-**Tag browser** (`T`): `j`/`k` move the cursor, `Enter` or `Space` toggle that
-tag as an active filter.
+| Key     | Action                                       |
+|---------|----------------------------------------------|
+| `w`/`i`/`x` | move note → WIP / IDEA / SHELF            |
+| `K`     | detail popup for the selected note           |
+| `p`     | open compiled PDF                            |
+| `c`     | compile in a terminal split                  |
+| `g` / `L` | git push / log                             |
+| `e`     | edit tags for the selected note              |
+| `n`     | new note from template (starts in IDEA)      |
+| `d`     | delete project                               |
+| `/`     | focus the search box                         |
+| `t` / `Tab` | jump to the tags pane                    |
+| `r`     | rescan from disk                             |
+| `Esc`   | clear an active filter, else close           |
+| `q`     | close      ·   `?`  help                     |
 
 ---
 

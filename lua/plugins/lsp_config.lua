@@ -74,7 +74,6 @@ return {
 			vim.lsp.config("texlab", {
 				capabilities = capabilities,
 			})
-
 			vim.lsp.config("tinymist", {
 				cmd = { "tinymist" },
 				filetypes = { "typst" },
@@ -86,6 +85,21 @@ return {
 							command = "tinymist.pinMain",
 							arguments = { main },
 						})
+						-- vim.keymap.set("n", "<leader>tp", function()
+						-- 	client.request("workspace/executeCommand", {
+						-- 		command = "tinymist.startDefaultPreview",
+						-- 		arguments = {},
+						-- 	})
+						-- end, { buffer = bufnr, desc = "Typst Preview (tinymist)" })
+						-- vim.keymap.set("n", "<leader>tk", function()
+						-- 	client.request("workspace/executeCommand", {
+						-- 		command = "tinymist.doKillPreview",
+						-- 		arguments = { "default_preview" },
+						-- 	})
+						-- end, { buffer = bufnr, desc = "Kill Typst Preview" })
+						vim.keymap.set("n", "<leader>tf", function()
+							vim.lsp.buf.format()
+						end, { buffer = bufnr, desc = "Format Typst" })
 					end
 				end,
 				settings = {
@@ -94,10 +108,19 @@ return {
 					formatterProseWrap = true,
 					formatterPrintWidth = 70,
 					formatterIndentSize = 4,
-					exportPdf = "onType",
+					exportPdf = "onSave",
+					preview = {
+						partialRendering = true,
+						browsing = {
+							args = {
+								"--data-plane-host=127.0.0.1:0",
+								"--invert-colors=never",
+								"--open",
+							},
+						},
+					},
 				},
 			})
-			-- LSP常用的快捷键
 			vim.keymap.set("n", "gd", vim.lsp.buf.definition, { desc = "Go to Definition" })
 			vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Hover Info" })
 			-- vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename" })

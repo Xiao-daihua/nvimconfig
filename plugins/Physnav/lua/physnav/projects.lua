@@ -114,6 +114,7 @@ local function scan_category(root, category)
           has_pdf     = pdf,
           tags        = {},
           last_opened = 0,   -- unix timestamp; 0 = never
+          status      = "idea", -- "idea" | "wip" | "shelf" ; new notes start as idea
         })
       end
     end
@@ -145,6 +146,7 @@ local function merge_from_cache(projects, cached)
     if cp then
       p.tags        = cp.tags        or {}
       p.last_opened = cp.last_opened or 0
+      p.status      = cp.status      or "idea"
     end
   end
 end
@@ -183,6 +185,7 @@ function M.load(data_file, root, categories, force)
     projects = {}
     for _, cp in ipairs(cached) do
       if uv.fs_stat(cp.path) then
+        cp.status = cp.status or "idea"  -- backfill for pre-status data files
         table.insert(projects, cp)
       end
     end
@@ -226,6 +229,19 @@ function M.update_tags(data_file, projects, project_name, new_tags)
   for _, p in ipairs(projects) do
     if p.name == project_name then
       p.tags = new_tags
+      break
+    end
+  end
+  M.save(data_file, projects)
+end
+
+-- -----------------------------------------------------------------
+--  Status update ("idea" | "wip" | "shelf")
+-- -----------------------------------------------------------------
+function M.set_status(data_file, projects, project_name, new_status)
+  for _, p in ipairs(projects) do
+    if p.name == project_name then
+      p.status = new_status
       break
     end
   end
