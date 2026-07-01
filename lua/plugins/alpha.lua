@@ -5,8 +5,8 @@ return {
 		local alpha = require("alpha")
 		local dashboard = require("alpha.themes.dashboard")
 
-		-- Header: 用 ASCII Art 拼出 X.D.H.
 		dashboard.section.header.val = {
+			"",
 			"",
 			"",
 			"",

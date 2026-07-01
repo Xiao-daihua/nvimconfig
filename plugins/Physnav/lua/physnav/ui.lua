@@ -137,10 +137,17 @@ local function compute_geometry(cfg)
 	local total_cols = vim.o.columns
 	local total_lines = vim.o.lines - vim.o.cmdheight - 2
 
-	local outer_w = math.max(70, math.floor(total_cols * (cfg.width or 0.86)))
-	outer_w = math.min(outer_w, total_cols - 2)
-	local outer_h = math.max(18, math.floor(total_lines * (cfg.height or 0.86)))
-	outer_h = math.min(outer_h, total_lines)
+	-- Compact, centered panel. Capped in absolute columns/rows so it never
+	-- sprawls on a wide monitor — the surrounding dark background is the
+	-- intended "breathing room", not empty sprawl.
+	local max_w = cfg.max_width or 86
+	local outer_w = math.floor(total_cols * (cfg.width or 0.7))
+	outer_w = math.max(64, math.min(outer_w, max_w, total_cols - 4))
+
+	local max_h = cfg.max_height or 34
+	local outer_h = math.floor(total_lines * (cfg.height or 0.8))
+	outer_h = math.max(18, math.min(outer_h, max_h, total_lines))
+
 	local outer_row = math.floor((total_lines - outer_h) / 2)
 	local outer_col = math.floor((total_cols - outer_w) / 2)
 
@@ -148,7 +155,7 @@ local function compute_geometry(cfg)
 	local body_h = outer_h - search_h - hints_h - gap * 2
 	if body_h < 8 then body_h = 8 end
 
-	local tags_w = math.max(14, cfg.sidebar_width or 20)
+	local tags_w = math.max(14, cfg.sidebar_width or 18)
 	local list_w = outer_w - tags_w - gap
 	if list_w < 30 then
 		tags_w = math.max(12, outer_w - 30 - gap)
@@ -294,7 +301,9 @@ local function render_list()
 	local inner_w = math.max(10, geom.width - 2)
 	local lines = { "" }
 	state.row_map = {}
+	local tag_spans = {} -- buffer-line(1-based) -> { col_s, col_e } byte cols of the tag text
 
+	local indent = "      " -- 6 spaces before a note name
 	local buckets = partition_buckets()
 	if #state.filtered == 0 then
 		table.insert(lines, "   (no notes match)")
@@ -306,12 +315,40 @@ local function render_list()
 			state.row_map[#lines] = { kind = "header", bucket = key }
 			if not folded then
 				for _, p in ipairs(items) do
-					table.insert(lines, "      " .. trunc(p.name, inner_w - 6))
+					-- Secondary info: the note's tags, right-aligned and dim.
+					local tag_str = (p.tags and #p.tags > 0) and table.concat(p.tags, " ") or ""
+					-- Reserve up to ~40% of width for tags.
+					local tag_max = math.floor(inner_w * 0.42)
+					if dw(tag_str) > tag_max then tag_str = trunc(tag_str, tag_max) end
+
+					local name_budget = inner_w - #indent - (tag_str ~= "" and (dw(tag_str) + 2) or 0)
+					local name = trunc(p.name, math.max(4, name_budget))
+
+					local row
+					if tag_str ~= "" then
+						local used = #indent + dw(name)
+						local pad = inner_w - used - dw(tag_str)
+						if pad < 2 then pad = 2 end
+						local prefix = indent .. name .. string.rep(" ", pad)
+						row = prefix .. tag_str
+						tag_spans[#lines + 1] = { #prefix, #row }
+					else
+						row = indent .. name
+					end
+					table.insert(lines, row)
 					state.row_map[#lines] = { kind = "note", project = p, bucket = key }
 				end
 			end
 			table.insert(lines, "")
 		end
+
+		-- Faint footer: a one-line tally so the fixed-height pane reads as
+		-- deliberate breathing room rather than forgotten emptiness.
+		local b = buckets
+		table.insert(lines, "")
+		table.insert(lines, string.format("   %d wip · %d idea · %d shelf",
+			#b.wip, #b.idea, #b.shelf))
+		state.row_map[#lines] = { kind = "footer" }
 	end
 
 	set_lines("list", lines)
@@ -325,7 +362,13 @@ local function render_list()
 			add_hl("list", hlg, z, 0, -1)
 		elseif e.kind == "note" and e.bucket == "shelf" then
 			add_hl("list", "PhysNavMuted", z, 0, -1)
+		elseif e.kind == "footer" then
+			add_hl("list", "PhysNavDim", z, 0, -1)
 		end
+	end
+	-- Dim the right-aligned tag text on note rows.
+	for ln, span in pairs(tag_spans) do
+		add_hl("list", "PhysNavDim", ln - 1, span[1], span[2])
 	end
 
 	if state.focus_project then

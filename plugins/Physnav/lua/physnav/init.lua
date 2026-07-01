@@ -6,8 +6,13 @@ M.config = {
 	open_cmd = "edit",
 	width = 0.92,
 	height = 0.88,
+	-- Hard caps (absolute columns/lines) so the panel stays a compact,
+	-- centered card on wide monitors instead of sprawling. Surrounding
+	-- space is intentional breathing room.
+	max_width = 86,
+	max_height = 34,
 	preview_width = 32,
-	sidebar_width = 22,
+	sidebar_width = 18,
 	-- List of subdirectories under root to scan for projects.
 	categories = { "EPFL_lecture", "Notes" },
 	-- "name" | "recent"
